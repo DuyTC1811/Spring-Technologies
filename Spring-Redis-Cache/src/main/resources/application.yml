@@ -1,0 +1,8 @@
+spring:
+  redis:
+    host: localhost
+    port: 6379
+#    username: redis
+    password: duytc
+    connect-timeout: 60000
+    database: 0
