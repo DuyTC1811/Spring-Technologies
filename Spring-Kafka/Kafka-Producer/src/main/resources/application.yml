@@ -1,0 +1,10 @@
+server:
+  port: 8098
+
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+
+  topic-kafka:
+    topic-example: test
