@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    hikari:
+      auto-commit: true
+      idle-timeout: 20000
+      maximum-pool-size: 2
+      max-lifetime: 1800000
+      connection-timeout: 20000
+      jdbc-url: jdbc:postgresql://localhost:5432/postgres
+      username: postgres
+      password: duytc
+      driver-class-name: org.postgresql.Driver
+
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: duytc
+
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: true
+
+  security:
+    jwtSecret: DUY-TC
+    jwtExpirationMs: 86400000
