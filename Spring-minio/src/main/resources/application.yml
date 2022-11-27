@@ -1,0 +1,13 @@
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 500MB
+      max-request-size: 500MB
+      file-size-threshold: 2KB
+
+  minio:
+    url: http://127.0.0.1:9000
+    bucket: file-storage
+    access-key: nfmDm7pk1uYYR0cj
+    secret-key: ylIHnz1vg1BChohehDhvwF7I2QWcdtfJ
