@@ -24,7 +24,7 @@ public class ControllerPostgres {
     @GetMapping("/info/{id}")
     public ResponseEntity<CustomerPostgres> info(@PathVariable Integer id) {
         CustomerPostgres response = customerPostgresService.infoCustomer(id);
-        return ResponseEntity.ok().body(new CustomerPostgres());
+        return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping("/delete-id/{id}")
