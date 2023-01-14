@@ -1,0 +1,45 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    hikari:
+      auto-commit: true
+      idle-timeout: 20000
+      maximum-pool-size: 2
+      max-lifetime: 1800000
+      connection-timeout: 20000
+      jdbc-url: jdbc:postgresql://localhost:5432/postgres
+      username: postgres
+      password: duytc
+      driver-class-name: org.postgresql.Driver
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: duytc
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: example
+      username: root
+      password: duytc
+      authentication-database: admin
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    org.springframework.data.mongodb.repository.Query: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
