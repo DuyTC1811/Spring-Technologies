@@ -23,11 +23,7 @@ public class ControllerPostgres {
 
     @GetMapping("/info/{id}")
     public ResponseEntity<CustomerPostgres> info(@PathVariable Integer id) {
-        for (int i = 0; i < 5; i++) {
-            CustomerPostgres response = customerPostgresService.infoCustomer(id);
-            System.out.println(response.toString());
-        }
-
+        CustomerPostgres response = customerPostgresService.infoCustomer(id);
         return ResponseEntity.ok().body(new CustomerPostgres());
     }
 
