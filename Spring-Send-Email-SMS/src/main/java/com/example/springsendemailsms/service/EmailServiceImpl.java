@@ -7,12 +7,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class IEmailServiceImpl implements IEmailService {
+public class EmailServiceImpl implements IEmailService {
     private static final String NOREPLY_ADDRESS = "ferssken@gmail.com";
     private static final String TO_ADDRESS = "ferssken99@gmail.com";
     private final JavaMailSender sender;
 
-    public IEmailServiceImpl(JavaMailSender sender) {
+    public EmailServiceImpl(JavaMailSender sender) {
         this.sender = sender;
     }
 
