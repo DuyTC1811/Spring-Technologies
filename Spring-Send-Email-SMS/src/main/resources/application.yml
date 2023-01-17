@@ -1,0 +1,21 @@
+spring:
+  mail:
+    port: 587
+    protocol: smtp
+    host: smtp.gmail.com
+    username: ferssken@gmail.com
+    password: xyzairpcopjcvxpd
+    properties.mail.smtp:
+      auth: true
+      starttls.enable: true
+
+  thymeleaf:
+    cache: false
+    check-template: true
+    check-template-location: false
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    enabled: true
+
+#https://memorynotfound.com/spring-boot-thymeleaf-configuration-example
