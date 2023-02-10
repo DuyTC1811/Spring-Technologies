@@ -1,0 +1,43 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.springmybatis.mapper.StudentMapper">
+    <insert id="insertStudent" parameterType="StudentVO" >
+        INSERT INTO STUDENT (id, name, address, age, male) VALUES (#{id}, #{name}, #{address}, #{age}, #{male});
+    </insert>
+
+<!--    <insert id="insertStudent" parameterType="Student" >-->
+<!--        INSERT INTO STUDENT (ID, NAME, BRANCH, PERCENTAGE, PHONE, EMAIL ) VALUES (#{id}, #{name}, #{branch}, #{percentage}, #{phone}, #{email});-->
+<!--    </insert>-->
+
+    <update id="updateStudent" parameterType="StudentVO">
+        INSERT INTO STUDENT (id, name, address, age, male) VALUES (#{id}, #{name}, #{address}, #{age}, #{male});
+    </update>
+
+    <delete id="deleteStudentById" parameterType="string">
+        DELETE from STUDENT WHERE ID = #{id};
+    </delete>
+
+    <select id="selectAllStudent" resultMap="result">
+        SELECT * FROM STUDENT;
+    </select>
+
+    <select id="info" parameterType="string" resultType="StudentVO">
+        SELECT * FROM STUDENT WHERE ID = #{id};
+    </select>
+    <select id="getPage" resultType="com.example.springmybatis.vo.StudentVO">
+
+    </select>
+
+    <select id="totalElement" resultType="integer">
+        SELECT COUNT(id) FROM student;
+    </select>
+
+    <resultMap id = "result" type = "StudentVO">
+        <result property = "id" column = "ID"/>
+        <result property = "name" column = "NAME"/>
+        <result property = "address" column = "ADDRESS"/>
+        <result property = "age" column = "AGE"/>
+        <result property = "male" column = "MALE"/>
+    </resultMap>
+</mapper>

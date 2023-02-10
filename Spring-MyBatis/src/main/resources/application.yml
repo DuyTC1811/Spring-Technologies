@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    hikari:
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: duytc
+    url: jdbc:postgresql://localhost:5432/postgres
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.example.springmybatis.vo   # Quét thư mục
+  mapper-locations: /mybatis/*.xml                     # Quét File .xml
+
+logging:
+  level:
+    com.example.springmybatis.mapper: TRACE
