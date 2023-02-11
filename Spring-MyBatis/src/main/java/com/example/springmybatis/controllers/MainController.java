@@ -24,8 +24,8 @@ public class MainController {
     }
 
     @PutMapping("/update-student")
-    public ResponseEntity<StudentVO> update(@RequestBody StudentVO student) {
-        StudentVO response = studentService.update(student);
+    public ResponseEntity<Integer> update(@RequestBody StudentVO student) {
+        int response = studentService.update(student);
         return ResponseEntity.ok().body(response);
     }
 
@@ -49,9 +49,9 @@ public class MainController {
 
     @GetMapping("/page")
     public ResponseEntity<Map<String, Object>> page(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "") String currentId,
             @RequestParam(defaultValue = "3") int size) {
-        Map<String, Object> response = studentService.getPage(page, size);
+        Map<String, Object> response = studentService.getPage(currentId, size);
         return ResponseEntity.ok().body(response);
     }
 }

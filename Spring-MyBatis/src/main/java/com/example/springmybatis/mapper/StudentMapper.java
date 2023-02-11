@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -13,11 +14,11 @@ public interface StudentMapper {
 
     int insertStudent(StudentVO students);
 
-    StudentVO updateStudent(StudentVO students);
+    int updateStudent(StudentVO students);
 
     StudentVO info(String id);
 
-    List<StudentVO> getPage(int limit, int offset);
+    List<StudentVO> getPage(Map<String, Object> param);
 
     void deleteStudentById(String id);
 

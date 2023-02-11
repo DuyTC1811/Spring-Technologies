@@ -26,7 +26,7 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public StudentVO update(StudentVO student) {
+    public int update(StudentVO student) {
         return studentMapper.updateStudent(student);
     }
 
@@ -46,14 +46,17 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public Map<String, Object> getPage(int limit, int offset) {
+    public Map<String, Object> getPage(String currentId, int limit) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("id", currentId);
+        param.put("limit", limit);
+
         Map<String, Object> response = new HashMap<>();
-        List<StudentVO> listStudent = studentMapper.getPage(limit, offset);
+        List<StudentVO> listStudent = studentMapper.getPage(param);
         int totalElements = studentMapper.totalElement();
         response.put("students", listStudent);
-        response.put("currentPage", limit);
         response.put("totalItems", totalElements);
-        response.put("totalPages", offset);
+        response.put("totalPages", limit);
         return response;
     }
 }

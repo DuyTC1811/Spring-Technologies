@@ -6,12 +6,8 @@
         INSERT INTO STUDENT (id, name, address, age, male) VALUES (#{id}, #{name}, #{address}, #{age}, #{male});
     </insert>
 
-<!--    <insert id="insertStudent" parameterType="Student" >-->
-<!--        INSERT INTO STUDENT (ID, NAME, BRANCH, PERCENTAGE, PHONE, EMAIL ) VALUES (#{id}, #{name}, #{branch}, #{percentage}, #{phone}, #{email});-->
-<!--    </insert>-->
-
-    <update id="updateStudent" parameterType="StudentVO">
-        INSERT INTO STUDENT (id, name, address, age, male) VALUES (#{id}, #{name}, #{address}, #{age}, #{male});
+    <update id="updateStudent" parameterType="StudentVO" >
+       UPDATE STUDENT SET name = #{name}, address = #{address}, age = #{age}, male = #{male} WHERE ID = #{id};
     </update>
 
     <delete id="deleteStudentById" parameterType="string">
@@ -25,8 +21,9 @@
     <select id="info" parameterType="string" resultType="StudentVO">
         SELECT * FROM STUDENT WHERE ID = #{id};
     </select>
-    <select id="getPage" resultType="com.example.springmybatis.vo.StudentVO">
 
+    <select id="getPage" resultType="StudentVO">
+        SELECT * FROM student WHERE id > #{id} ORDER BY id LIMIT #{limit};
     </select>
 
     <select id="totalElement" resultType="integer">
