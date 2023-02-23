@@ -1,12 +1,11 @@
 package com.example.springmybatis.controllers;
 
-import com.example.springmybatis.services.IStudentService;
-import com.example.springmybatis.vo.StudentVO;
+import com.example.springmybatis.entity.StudentVO;
+import com.example.springmybatis.handlers.IStudentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -47,11 +46,4 @@ public class MainController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/page")
-    public ResponseEntity<Map<String, Object>> page(
-            @RequestParam(defaultValue = "") String currentId,
-            @RequestParam(defaultValue = "3") int size) {
-        Map<String, Object> response = studentService.getPage(currentId, size);
-        return ResponseEntity.ok().body(response);
-    }
 }

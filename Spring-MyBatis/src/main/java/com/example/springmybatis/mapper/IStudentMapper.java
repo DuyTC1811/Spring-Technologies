@@ -1,6 +1,6 @@
 package com.example.springmybatis.mapper;
 
-import com.example.springmybatis.vo.StudentVO;
+import com.example.springmybatis.entity.StudentVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Mapper
 @Repository
-public interface StudentMapper {
+public interface IStudentMapper {
     List<StudentVO> selectAllStudent();
 
     int insertStudent(StudentVO students);

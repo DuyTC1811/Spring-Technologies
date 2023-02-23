@@ -1,15 +1,14 @@
-package com.example.springmybatis.services;
+package com.example.springmybatis.handlers;
 
-import com.example.springmybatis.vo.StudentVO;
+import com.example.springmybatis.entity.StudentVO;
 
 import java.util.List;
 import java.util.Map;
 
 public interface IStudentService {
-    int insert(StudentVO student);
+    void insert(StudentVO student);
     int update(StudentVO student);
     void delete(String id);
     List<StudentVO> getList();
     StudentVO infor(String id);
-    Map<String, Object> getPage(String currentId , int offset);
 }

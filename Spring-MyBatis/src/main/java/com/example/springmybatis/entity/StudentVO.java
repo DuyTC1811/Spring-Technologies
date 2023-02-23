@@ -1,6 +1,5 @@
-package com.example.springmybatis.vo;
+package com.example.springmybatis.entity;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
