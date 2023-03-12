@@ -10,8 +10,4 @@ public class DatabaseContextHolder {
     public static DataSourceType getContext() {
         return CONTEXT.get();
     }
-
-    public static void resetContext() {
-        CONTEXT.set(DataSourceType.MASTER);
-    }
 }
