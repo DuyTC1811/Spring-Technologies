@@ -1,11 +1,9 @@
 package com.example.springcqrs.dto;
 
-import com.example.springcqrs.cqrs.command.ICommand;
+import com.example.springcqrs.cqrs.query.IQuery;
 import lombok.Data;
 
 @Data
-public class CCustomerRequest implements ICommand<CCustomerResponse> {
-    private int id;
+public class QCustomerPageRequest implements IQuery<QCustomerPageResponse> {
     private String name;
-    private int age;
 }
