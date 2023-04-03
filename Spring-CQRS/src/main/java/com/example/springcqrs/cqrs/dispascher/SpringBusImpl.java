@@ -18,13 +18,13 @@ public class SpringBusImpl implements ISpringBus {
 
     @Override
     public <RESPONSE, REQUEST extends ICommand<RESPONSE>> RESPONSE executeCommand(REQUEST command) {
-        ICommandHandler<RESPONSE, REQUEST> ICommandHandler = (ICommandHandler<RESPONSE, REQUEST>) registry.getCmd(command.getClass());
-        return ICommandHandler.handler(command);
+        ICommandHandler<RESPONSE, REQUEST> commandHandler = registry.getCmd(command.getClass());
+        return commandHandler.handler(command);
     }
 
     @Override
     public <RESPONSE, REQUEST extends IQuery<RESPONSE>> RESPONSE executeQuery(REQUEST query) {
-        IQueryHandler<RESPONSE, REQUEST> IQueryHandler = (IQueryHandler<RESPONSE, REQUEST>) registry.getQuery(query.getClass());
-        return IQueryHandler.handle(query);
+        IQueryHandler<RESPONSE, REQUEST> queryHandler = registry.getQuery(query.getClass());
+        return queryHandler.handle(query);
     }
 }

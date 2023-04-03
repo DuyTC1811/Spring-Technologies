@@ -40,13 +40,13 @@ public class ConfigurationBatch {
         return itemReader;
     }
 
-    private LineMapper<Customer> lineMapper() {  // map từng dòng
+    private LineMapper<Customer> lineMapper() {                                                                             // map từng dòng
         DefaultLineMapper<Customer> lineMapper = new DefaultLineMapper<>();
 
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
-        lineTokenizer.setDelimiter(","); // chỉ da chỗ phân cách bằng giấu phẩy hoặc các giấu khác dùng để phân cách
+        lineTokenizer.setDelimiter(",");                                                                                    // chỉ da chỗ phân cách bằng giấu phẩy hoặc các giấu khác dùng để phân cách
         lineTokenizer.setStrict(true);
-        lineTokenizer.setNames("id", "firstName", "lastName", "email", "gender", "contactNo", "country", "dob"); // những field cần map
+        lineTokenizer.setNames("id", "firstName", "lastName", "email", "gender", "contactNo", "country", "dob");            // những field cần map
 
         BeanWrapperFieldSetMapper<Customer> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
         fieldSetMapper.setTargetType(Customer.class);
@@ -58,24 +58,24 @@ public class ConfigurationBatch {
 
     @Bean
     public CustomerProcessor processor() {
-        return new CustomerProcessor(); // gọi đến bộ sử lý trong đó mình có thể sử lý logic mà ta muốn
+        return new CustomerProcessor();                                                 // gọi đến bộ sử lý trong đó mình có thể sử lý logic mà ta muốn
     }
 
     @Bean
-    public RepositoryItemWriter<Customer> writer() { // cấu hình để dùng reppository
+    public RepositoryItemWriter<Customer> writer() {                                    // cấu hình để dùng reppository
         RepositoryItemWriter<Customer> writer = new RepositoryItemWriter<>();
-        writer.setRepository(customerRepository); // set repository
-        writer.setMethodName("save"); // các phương thức ta ta dùng ví dụ "save" "delete" "getAll"
+        writer.setRepository(customerRepository);                                       // set repository
+        writer.setMethodName("save");                                                   // các phương thức ta ta dùng ví dụ "save" "delete" "getAll"
         return writer;
     }
 
     @Bean
     public Step step1() {
         return stepBuilderFactory.get("csv-step")
-                .<Customer, Customer>chunk(10) // mỗi lần sử lý 10 bản ghi
-                .reader(reader()) // gọi phương thức "reder"
-                .processor(processor()) // gọi phương thức "processor"
-                .writer(writer()) // gọi phương thức ghi data vào data base
+                .<Customer, Customer>chunk(10)                  // mỗi lần sử lý 10 bản ghi
+                .reader(reader())                       // Gọi phương thức "reder"
+                .processor(processor())                 // Gọi phương thức "processor"
+                .writer(writer())                       // Gọi phương thức ghi data vào data base
                 .taskExecutor(taskExecutor())
                 .build();
     }
