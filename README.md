@@ -1,2 +1,2 @@
 # Spring-Technologies
-this is the repository  of all the technologies that revolve around Spring-boot
+This repository is used to store configurations and deploy technologies around Spring Boot
