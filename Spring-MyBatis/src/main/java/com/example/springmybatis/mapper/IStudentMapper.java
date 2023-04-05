@@ -12,7 +12,7 @@ import java.util.Map;
 public interface IStudentMapper {
     List<StudentVO> selectAllStudent();
 
-    int insertStudent(StudentVO students);
+//    int insertStudent(StudentVO students);
 
     int updateStudent(StudentVO students);
 

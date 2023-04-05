@@ -1,4 +1,4 @@
-package com.example.springmybatis.controllers;
+package com.example.springmybatis.controllers.querys;
 
 import com.example.springmybatis.dto.requests.StudentPageRequest;
 import com.example.springmybatis.dto.responses.StudentPageResponse;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class StudentQueryPageController extends QueryController<StudentPageResponse, StudentPageRequest> {
+public class QueryStudentPageCtrl extends QueryController<StudentPageResponse, StudentPageRequest> {
     @Override
     @RequestMapping("/page")
     protected ResponseEntity<StudentPageResponse> coordinator(@RequestBody StudentPageRequest request) {

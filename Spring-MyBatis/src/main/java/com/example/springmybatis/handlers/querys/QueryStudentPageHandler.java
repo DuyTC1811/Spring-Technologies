@@ -1,4 +1,4 @@
-package com.example.springmybatis.handlers;
+package com.example.springmybatis.handlers.querys;
 
 import com.example.springmybatis.dto.requests.StudentPageRequest;
 import com.example.springmybatis.dto.responses.StudentPageResponse;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class StudentPageHandler implements IQueryHandler<StudentPageResponse, StudentPageRequest> {
+public class QueryStudentPageHandler implements IQueryHandler<StudentPageResponse, StudentPageRequest> {
     private final IStudentMapper studentMapper;
 
     @Override

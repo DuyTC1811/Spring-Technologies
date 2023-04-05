@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface IStudentService {
-    void insert(StudentVO student);
+//    void insert(StudentVO student);
     int update(StudentVO student);
     void delete(String id);
     List<StudentVO> getList();

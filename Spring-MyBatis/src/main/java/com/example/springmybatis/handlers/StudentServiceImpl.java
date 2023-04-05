@@ -17,11 +17,11 @@ public class StudentServiceImpl implements IStudentService {
         this.IStudentMapper = IStudentMapper;
     }
 
-    @Override
-    public void insert(StudentVO student) {
-        student.setId(UUID.randomUUID().toString());
-        IStudentMapper.insertStudent(student);
-    }
+//    @Override
+//    public void insert(StudentVO student) {
+//        student.setId(UUID.randomUUID().toString());
+//        IStudentMapper.insertStudent(student);
+//    }
 
     @Override
     public int update(StudentVO student) {
