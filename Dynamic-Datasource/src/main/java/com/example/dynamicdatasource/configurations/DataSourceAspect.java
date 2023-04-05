@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataSourceAspect {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceAspect.class);
+
     @Around("@annotation(withDatabase)")
     public Object proceed(ProceedingJoinPoint proceedingJoinPoint, WithDatabase withDatabase) {
         try {
@@ -20,7 +21,8 @@ public class DataSourceAspect {
             LOGGER.info("Aspect executed {}", withDatabase.value());
             return proceedingJoinPoint.proceed();
         } catch (Throwable e) {
-            throw new RuntimeException(e);
+            LOGGER.error(" Aspect Error");
+            return new Object();
         }
     }
 }
