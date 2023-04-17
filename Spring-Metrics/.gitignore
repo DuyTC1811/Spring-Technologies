@@ -1,5 +1,7 @@
 HELP.md
 .gradle
+/grafana-storage
+./data
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
