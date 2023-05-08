@@ -1,5 +1,7 @@
 package com.example.springcqrs.cqrs.query;
 
+import com.example.springcqrs.cqrs.model.BaseResponse;
+
 public interface IQueryHandler<RESPONSE, REQUEST extends IQuery<RESPONSE>> {
-    RESPONSE handle(REQUEST query);
+    BaseResponse<RESPONSE> handle(REQUEST query);
 }
