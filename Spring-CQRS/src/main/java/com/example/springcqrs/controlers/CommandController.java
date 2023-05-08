@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommandController extends ControllerCommand<CCustomerResponse, CCustomerRequest> {
     @Override
     @PostMapping("/command")
-    protected ResponseEntity<BaseResponse<CCustomerResponse>> executes(@RequestBody CCustomerRequest request) {
+    protected ResponseEntity<BaseResponse<CCustomerResponse>> executesCommand(@RequestBody CCustomerRequest request) {
         return execute(request);
     }
-
 
 }

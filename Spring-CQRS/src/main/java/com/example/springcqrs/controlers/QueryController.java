@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class QueryController extends ControllerQuery<QCustomerResponse, QCustomerRequest> {
     @Override
     @GetMapping("/query")
-    protected ResponseEntity<BaseResponse<QCustomerResponse>> executes(@RequestBody QCustomerRequest request) {
+    protected ResponseEntity<BaseResponse<QCustomerResponse>> executesQuery(@RequestBody QCustomerRequest request) {
         return execute(request);
     }
 }

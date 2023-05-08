@@ -20,5 +20,5 @@ public abstract class ControllerCommand<RESPONSE, REQUEST extends ICommand<RESPO
         return new ResponseEntity<>(springBus.executeCommand(request), HttpStatus.OK);
     }
 
-    protected abstract ResponseEntity<BaseResponse<RESPONSE>> executes(REQUEST request);
+    protected abstract ResponseEntity<BaseResponse<RESPONSE>> executesCommand(REQUEST request);
 }

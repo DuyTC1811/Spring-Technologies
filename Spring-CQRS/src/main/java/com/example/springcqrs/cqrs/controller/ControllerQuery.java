@@ -20,5 +20,5 @@ public abstract class ControllerQuery<RESPONSE, REQUEST extends IQuery<RESPONSE>
         return new ResponseEntity<>(springBus.executeQuery(request), HttpStatus.OK);
     }
 
-    protected abstract ResponseEntity<BaseResponse<RESPONSE>> executes(REQUEST request);
+    protected abstract ResponseEntity<BaseResponse<RESPONSE>> executesQuery(REQUEST request);
 }
