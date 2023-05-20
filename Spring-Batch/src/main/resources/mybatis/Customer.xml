@@ -1,0 +1,11 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.springbatch.repository.CustomerMapper">
+    <insert id="insert" parameterType="Customer">
+        <![CDATA[
+        INSERT INTO CUSTOMERS_INFO (customer_id, contact, country, dob, email, first_name, gender, last_name)
+        VALUES (#{id}, #{contactNo}, #{country}, #{dob}, #{email}, #{firstName}, #{gender}, #{lastName});
+        ]]>
+    </insert>
+</mapper>

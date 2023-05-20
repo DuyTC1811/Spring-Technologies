@@ -1,34 +1,46 @@
 package com.example.springbatch.job;
 
 import com.example.springbatch.entity.Customer;
-import com.example.springbatch.repository.CustomerRepository;
-import lombok.AllArgsConstructor;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.batch.MyBatisBatchItemWriter;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
 @Configuration
 @EnableBatchProcessing
-@AllArgsConstructor
 public class ConfigurationBatch {
+    @Qualifier("taskExecutor")
+    private final TaskExecutor taskExecutor;
+    private final SqlSessionFactory sqlSessionFactory;
     private final JobBuilderFactory jobBuilderFactory;
 
     private final StepBuilderFactory stepBuilderFactory;
 
-    private final CustomerRepository customerRepository;
+    public ConfigurationBatch(
+            @Qualifier("taskExecutor") TaskExecutor taskExecutor,
+            SqlSessionFactory sqlSessionFactory,
+            JobBuilderFactory jobBuilderFactory,
+            StepBuilderFactory stepBuilderFactory) {
+        this.taskExecutor = taskExecutor;
+        this.sqlSessionFactory = sqlSessionFactory;
+        this.jobBuilderFactory = jobBuilderFactory;
+        this.stepBuilderFactory = stepBuilderFactory;
+    }
 
     @Bean // Đọc từ file CSV
     public FlatFileItemReader<Customer> reader() {
@@ -58,33 +70,42 @@ public class ConfigurationBatch {
 
     @Bean
     public CustomerProcessor processor() {
-        return new CustomerProcessor();                                                 // gọi đến bộ sử lý trong đó mình có thể sử lý logic mà ta muốn
+        return new CustomerProcessor();                                                     // gọi đến bộ sử lý trong đó mình có thể sử lý logic mà ta muốn
     }
 
     @Bean
-    public RepositoryItemWriter<Customer> writer() {                                    // cấu hình để dùng reppository
-        RepositoryItemWriter<Customer> writer = new RepositoryItemWriter<>();
-        writer.setRepository(customerRepository);                                       // set repository
-        writer.setMethodName("save");                                                   // các phương thức ta ta dùng ví dụ "save" "delete" "getAll"
+    public MyBatisBatchItemWriter<Customer> writer() {                                     // cấu hình để dùng reppository
+        MyBatisBatchItemWriter<Customer> writer = new MyBatisBatchItemWriter<>();
+        writer.setSqlSessionFactory(sqlSessionFactory);                                    // set repository
+        writer.setStatementId("insert");                                                   // các phương thức ta ta dùng ví dụ "save" "delete" "getAll"
         return writer;
     }
 
     @Bean
     public Step step1() {
-        return stepBuilderFactory.get("csv-step")
-                .<Customer, Customer>chunk(10)                  // mỗi lần sử lý 10 bản ghi
-                .reader(reader())                       // Gọi phương thức "reder"
-                .processor(processor())                 // Gọi phương thức "processor"
-                .writer(writer())                       // Gọi phương thức ghi data vào data base
-                .taskExecutor(taskExecutor())
+        return stepBuilderFactory
+                .get("csv-step")
+                .<Customer, Customer>chunk(500)                 // mỗi lần sử lý 10 bản ghi
+                .reader(reader())                                        // Gọi phương thức "reder"
+                .processor(processor())                                  // Gọi phương thức "processor"
+                .writer(writer())                                        // Gọi phương thức ghi data vào data base
+                .taskExecutor(taskExecutor)
                 .build();
     }
 
     @Bean
-    public TaskExecutor taskExecutor() {
-        SimpleAsyncTaskExecutor asyncTaskExecutor = new SimpleAsyncTaskExecutor();
-        asyncTaskExecutor.setConcurrencyLimit(10);
-        return asyncTaskExecutor;
+    public JobExecutionListener listener() {
+        return new JobExecutionListener() {
+            @Override
+            public void beforeJob(JobExecution jobExecution) {
+                System.out.println("before job");
+            }
+
+            @Override
+            public void afterJob(JobExecution jobExecution) {
+                System.out.println("after job");
+            }
+        };
     }
 
     @Bean

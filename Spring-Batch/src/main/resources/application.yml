@@ -1,20 +1,17 @@
 spring:
   datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://192.168.100.23:5432/postgres
+    username: duytc
+    password: duytc
+    type: com.zaxxer.hikari.HikariDataSource
     hikari:
       auto-commit: true
       idle-timeout: 20000
       maximum-pool-size: 2
       max-lifetime: 1800000
       connection-timeout: 20000
-      jdbc-url: jdbc:postgresql://localhost:5432/postgres
-      username: postgres
-      password: duytc
-      driver-class-name: org.postgresql.Driver
-
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: duytc
+      pool-name: Pool ==>
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -30,3 +27,8 @@ spring:
     job:
       enabled: false
 
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.example.springbatch.entity  # Quét thư mục
+  mapper-locations: /mybatis/*.xml                      # Quét thư mục .XML
