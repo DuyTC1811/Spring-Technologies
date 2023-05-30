@@ -13,12 +13,12 @@ spring:
       connection-timeout: 20000
       pool-name: Pool ==>
 
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    open-in-view: true
+#  jpa:
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    open-in-view: true
 
   batch:
     jdbc:
@@ -27,8 +27,15 @@ spring:
     job:
       enabled: false
 
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-  type-aliases-package: com.example.springbatch.entity  # Quét thư mục
-  mapper-locations: /mybatis/*.xml                      # Quét thư mục .XML
+#mybatis:
+#  configuration:
+#    map-underscore-to-camel-case: true
+#  type-aliases-package: com.example.springbatch.entity  # Quét thư mục
+#  mapper-locations: /mybatis/*.xml                      # Quét thư mục .XML
+
+#logging:
+#  level:
+#    com.example.springbatch.repository: DEBUG
+
+
+
