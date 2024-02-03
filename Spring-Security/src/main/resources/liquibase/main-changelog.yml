@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - includeAll:
+      path: changelog/changelog-table
+      relativeToChangelogFile: true
+#  - includeAll:
+#      file: changelog-index
+#      relativeToChangelogFile: true
+#  - includeAll:
+#      file: changelog-procedure
+#      relativeToChangelogFile: true
+#  - includeAll:
+#      file: changelog-view
+#      relativeToChangelogFile: true

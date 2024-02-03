@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://database-security.cfksmuu4gy14.ap-southeast-1.rds.amazonaws.com:5432/postgres
+    username: postgres
+    password: anhduy12
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      auto-commit: true
+      idle-timeout: 20000
+      maximum-pool-size: 2
+      max-lifetime: 200000
+      connection-timeout: 20000
+      pool-name: Connect ===>
+
+  liquibase:
+    change-log: classpath:liquibase/main-changelog.yml
+    clear-checksums: true
+
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: org.example.springsecurity.requests, org.example.springsecurity.responses
+  type-handlers-package: org.example.springsecurity.util
+  mapper-locations: /mybatis/*.xml
