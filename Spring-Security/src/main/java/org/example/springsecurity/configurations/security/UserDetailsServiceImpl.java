@@ -1,4 +1,4 @@
-package org.example.springsecurity.configurations;
+package org.example.springsecurity.configurations.security;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.repositories.IFindByUsernameMapper;
