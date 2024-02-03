@@ -4,7 +4,7 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://database-security.cfksmuu4gy14.ap-southeast-1.rds.amazonaws.com:5432/postgres
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: anhduy12
     type: com.zaxxer.hikari.HikariDataSource
@@ -19,6 +19,8 @@ spring:
   liquibase:
     change-log: classpath:liquibase/main-changelog.yml
     clear-checksums: true
+  security:
+    jwtSecret: duytc123
 
 
 mybatis:

@@ -25,7 +25,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         var jwtToken = parseJwtToken(request);
         if (jwtUtil.validateJwtToken(jwtToken)) {
-            var username = jwtUtil.getUserNameFromJwtToken(jwtToken);
+            var username = jwtUtil.extractUsername(jwtToken);
             var userDetails = userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(filterChain, userDetails);
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
