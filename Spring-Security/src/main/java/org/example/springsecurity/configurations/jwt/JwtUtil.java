@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 @Component
@@ -23,8 +24,9 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Set<String> roles) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", roles);
         return createToken(claims, username);
     }
 
