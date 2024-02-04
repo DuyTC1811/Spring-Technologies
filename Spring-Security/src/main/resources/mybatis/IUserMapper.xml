@@ -1,0 +1,23 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.springsecurity.repositories.IUserMapper">
+    <insert id="registerUser" parameterType="RegisterUserRequest">
+        INSERT INTO USERS (USER_ID, USERNAME, PASSWORD)
+        VALUES (#{userId}, #{username}, #{password});
+        <foreach collection="rolesIds" item="roleId">
+            INSERT INTO USER_ROLE (USER_ID, ROLE_ID) VALUES (#{userId}, #{roleId});
+        </foreach>
+    </insert>
+
+    <update id="lastLogin">
+        UPDATE USERS
+        SET LASTLOGIN = #{time}
+        WHERE USERNAME = #{username} AND ACTIVE = 'ACTIVE';
+    </update>
+
+    <select id="isExistsUsername" parameterType="string" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM USERS WHERE USERNAME = #{username})
+    </select>
+
+</mapper>

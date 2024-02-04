@@ -63,3 +63,8 @@ CREATE TABLE user_role
     CONSTRAINT fkr_user FOREIGN KEY (user_id)
         REFERENCES users (user_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
+
+INSERT INTO role (ROLE_ID, TITLE, SLUG, ACTIVE, DESCRIPTION, CREATED_AT)
+VALUES ('8cf8a4ad-746b-43fd-9c3e-87681a55380e', 'Cấp ADMIN', 'ROLE_ADMIN', 'ACTIVE', 'Thông tin mô tả ADMIN', '2023-02-25'),
+       ('0124f4ad-ea1e-47f3-8a23-b53f0c21c90b', 'Cấp User', 'ROLE_USER', 'ACTIVE', 'Thông tin mô tả USER', '2023-02-25'),
+       ('469bbb21-79ce-43a0-b8aa-9ee181572109', 'Cấp Manage', 'ROLE_MANAGER', 'ACTIVE', 'Thông tin mô tả MANAGER', '2023-02-25');
