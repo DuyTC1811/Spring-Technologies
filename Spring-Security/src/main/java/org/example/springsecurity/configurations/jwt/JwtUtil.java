@@ -17,7 +17,8 @@ import java.util.function.Function;
 public class JwtUtil {
     @Value("${spring.security.jwtSecret}")
     private String jwtSecret;
-    private static final long EXPIRATION_TIME = 900_000;
+    @Value("${spring.security.expiration-time}")
+    private int expirationTime;
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthTokenFilter.class);
 
     public String extractUsername(String token) {
@@ -35,7 +36,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }

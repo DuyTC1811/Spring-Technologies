@@ -21,6 +21,7 @@ spring:
     clear-checksums: true
   security:
     jwtSecret: duytc123
+    expiration-time: 900000
 
 springdoc:
   api-docs:
