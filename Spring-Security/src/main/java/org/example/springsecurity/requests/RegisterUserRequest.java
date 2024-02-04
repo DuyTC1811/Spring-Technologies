@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,5 +15,5 @@ public class RegisterUserRequest {
     private String userId = UUID.randomUUID().toString();
     private String username;
     private String password;
-    private Set<String> roles;
+    private Set<String> roles = new HashSet<>();
 }

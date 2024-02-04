@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class UserDetailsImpl implements UserDetails {
-    private String uuid;
+    private String userId;
     private String username;
     private String userCode;
     private String password;
@@ -62,6 +62,6 @@ public class UserDetailsImpl implements UserDetails {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
-        return Objects.equals(uuid, user.uuid);
+        return Objects.equals(userId, user.userId);
     }
 }

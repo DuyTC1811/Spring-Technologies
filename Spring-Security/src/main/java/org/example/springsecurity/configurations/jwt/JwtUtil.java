@@ -49,7 +49,7 @@ public class JwtUtil {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
     }
     public boolean validateJwtToken(String authToken) {
-        if(StringUtils.hasText(authToken)) return false;
+        if (StringUtils.hasText(authToken)) return false;
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;

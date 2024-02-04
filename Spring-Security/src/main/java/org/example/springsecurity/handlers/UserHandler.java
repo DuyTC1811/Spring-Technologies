@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.configurations.jwt.JwtUtil;
 import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.repositories.IRoleMapper;
+import org.example.springsecurity.repositories.ITokenMapper;
 import org.example.springsecurity.repositories.IUserMapper;
 import org.example.springsecurity.requests.LoginRequest;
 import org.example.springsecurity.requests.RegisterUserRequest;
@@ -28,6 +29,7 @@ public class UserHandler implements IUserHandler {
     private final JwtUtil jwtUtil;
     private final IUserMapper userMapper;
     private final IRoleMapper roleMapper;
+    private final ITokenHandler tokenHandler;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -44,7 +46,7 @@ public class UserHandler implements IUserHandler {
         Set<String> roles = new HashSet<>();
 
         // Lấy toàn bộ roles sau đó map key value
-        Map<String, String> stringMap = roleMapper.findRoles().stream()
+        var stringMap = roleMapper.findRoles().stream()
                 .collect(Collectors.toMap(
                         key -> key.get("slug").toString(),
                         value -> value.get("role_id").toString()
@@ -56,12 +58,17 @@ public class UserHandler implements IUserHandler {
         );
         registerRequest.setRoles(roles);
         userMapper.registerUser(registerRequest);
+
+        // generate Token khi đăng ký thành công
         String token = jwtUtil.generateToken(registerRequest.getUsername(), roles);
-        return new RegisterUserResponse(token, null);
+        String resetToken = tokenHandler.createRefreshToken(registerRequest.getUserId());
+        return new RegisterUserResponse(token, resetToken);
     }
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
         return null;
     }
+
+
 }
