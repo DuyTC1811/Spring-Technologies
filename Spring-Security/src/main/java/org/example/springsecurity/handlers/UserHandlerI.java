@@ -19,7 +19,6 @@ public class UserHandlerI implements IServiceUser {
     @Override
     public RegisterResponse register(RegisterRequest registerRequest) {
         int register = registerMapper.register(registerRequest);
-
         return null;
     }
 

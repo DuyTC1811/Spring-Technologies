@@ -24,8 +24,8 @@ spring:
 
 springdoc:
   api-docs:
-    url-product: http://docs.postgresql.
-    url-dev: http://docs.postgresql.
+    url-product: http://localhost:8080
+    url-dev: http://localhost:8080
 
 
 mybatis:
