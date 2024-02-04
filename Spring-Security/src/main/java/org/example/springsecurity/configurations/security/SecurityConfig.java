@@ -17,6 +17,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) {
         try {
             httpSecurity.authorizeHttpRequests(authorize -> authorize
+                            .requestMatchers(
+                                    "/swagger-ui/**",
+                                    "/v3/api-docs/**",
+                                    "/swagger-resources/**",
+                                    "/webjars/**").permitAll()
                             .requestMatchers("/api/loan").hasAuthority("USER")
                             .anyRequest().authenticated())
                     .formLogin(withDefaults())

@@ -3,6 +3,6 @@
 <mapper namespace="org.example.springsecurity.repositories.IRegisterMapper">
     <insert id="register">
         INSERT INTO users (USER_ID, USERNAME, PASSWORD)
-        VALUES (#{user_id}, #{username}, #{mobile}, #{email}, #{password}})
+        VALUES (#{user_id}, #{username}, #{password}})
     </insert>
 </mapper>
