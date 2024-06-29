@@ -1,12 +1,18 @@
 package org.example.springsecurity.configurations.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParserBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,10 +22,10 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
     @Value("${spring.security.jwtSecret}")
-    private String jwtSecret;
+    private String secretKey;
     @Value("${spring.security.expiration-time}")
     private int expirationTime;
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthTokenFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtUtil.class);
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -28,42 +34,84 @@ public class JwtUtil {
     public String generateToken(String username, Set<String> roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", roles);
-        return createToken(claims, username);
+        return createToken(claims, username, expirationTime);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS256, jwtSecret)
-                .compact();
-    }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+
+    /**
+     * Phương thức tạo Token
+     *
+     * @param claims              thông tin cần thêm
+     * @param subject             token này là của ai
+     * @param tokenExpirationTime thời hạn token này có thể tồn tại (millisecond)
+     * @return trả về một chuỗi token
+     */
+    private String createToken(Map<String, Object> claims, String subject, long tokenExpirationTime) {
+        return Jwts.builder()
+                .subject(subject)
+                .claims(claims)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + tokenExpirationTime))
+                .signWith(generalSigningKey())
+                .compact();
     }
+
+    /**
+     * Phương thức trích xuất thông tin từ JWT
+     *
+     * @param token JWT token cần trích xuất claims
+     * @return thông tin bên trong JWT
+     */
+    private Claims extractAllClaims(String token) {
+        JwtParserBuilder parserBuilder = Jwts.parser().verifyWith(generalSigningKey());
+        return parserBuilder.build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    /**
+     * Phương thức kiểm tra tính hợp lệ của JWT token
+     *
+     * @param authToken JWT token cần kiểm tra
+     * @return boolean giá trị true nếu token hợp lệ, false nếu không hợp lệ
+     */
     public boolean validateJwtToken(String authToken) {
-        if (StringUtils.hasText(authToken)) return false;
+        if (authToken == null || authToken.trim().isEmpty()) {
+            return false;
+        }
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            Jwts.parser()
+                    .verifyWith(generalSigningKey())
+                    .build()
+                    .parseSignedClaims(authToken);
             return true;
-        } catch (SignatureException exception) {
-            LOGGER.error("Invalid JWT signature: {}", exception.getMessage());
-        } catch (MalformedJwtException exception) {
-            LOGGER.error("Invalid JWT token: {}", exception.getMessage());
-        } catch (ExpiredJwtException exception) {
-            LOGGER.error("JWT token is expired: {}", exception.getMessage());
-        } catch (UnsupportedJwtException exception) {
-            LOGGER.error("JWT token is unsupported: {}", exception.getMessage());
-        } catch (IllegalArgumentException exception) {
-            LOGGER.error("JWT claims string is empty: {}", exception.getMessage());
+        } catch (JwtException exception) {
+            LOGGER.error("[ JWT ] validation error: {}", exception.getMessage());
         }
         return false;
+    }
+
+    /**
+     * Phương thức trích xuất JWT từ HttpServletRequest
+     *
+     * @param request HttpServletRequest chứa JWT
+     * @return JWT token nếu tìm thấy, null nếu không tìm thấy
+     */
+    public static String parseJwt(HttpServletRequest request) {
+        String value = request.getHeader("Authorization");
+        if (value != null && value.startsWith("Bearer ")) {
+            return value.substring(7);
+        }
+        return null;
+    }
+
+    private SecretKey generalSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
