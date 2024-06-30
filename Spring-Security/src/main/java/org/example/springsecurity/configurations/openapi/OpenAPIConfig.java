@@ -1,9 +1,13 @@
 package org.example.springsecurity.configurations.openapi;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -46,8 +50,42 @@ public class OpenAPIConfig {
                 .termsOfService("https://github.com/DuyTC1811")
                 .license(mitLicense);
 
+        ExternalDocumentation externalDocumentation = new ExternalDocumentation();
+        externalDocumentation.setDescription("DEV");
+        externalDocumentation.setUrl("https://springshop.wiki.github.org/docs");
+
+        // Tạo SecurityRequirement cho Bearer Authentication WEB
+        SecurityRequirement securityRequirementWeb = new SecurityRequirement();
+        securityRequirementWeb.addList("Bearer Authentication WEB");
+
+        // Tạo SecurityRequirement cho Bearer Authentication APP
+        SecurityRequirement securityRequirementApp = new SecurityRequirement();
+        securityRequirementApp.addList("Bearer Authentication APP");
+
+        // Tạo SecurityScheme cho Bearer Authentication WEB
+        SecurityScheme schemeWeb = new SecurityScheme();
+        schemeWeb.setBearerFormat("JWT");
+        schemeWeb.setScheme("bearer");
+        schemeWeb.setType(SecurityScheme.Type.HTTP);
+        schemeWeb.setDescription("Authentication for WEB clients");
+
+        // Tạo SecurityScheme cho Bearer Authentication APP
+        SecurityScheme schemeApp = new SecurityScheme();
+        schemeApp.setBearerFormat("JWT");
+        schemeApp.setScheme("bearer");
+        schemeApp.setType(SecurityScheme.Type.HTTP);
+        schemeApp.setDescription("Authentication for APP clients");
+
+        Components components = new Components();
+        components.addSecuritySchemes("Bearer Authentication WEB", schemeWeb);
+        components.addSecuritySchemes("Bearer Authentication APP", schemeApp);
+
         return new OpenAPI()
                 .info(info)
+                .externalDocs(externalDocumentation)
+                .addSecurityItem(securityRequirementWeb)
+                .addSecurityItem(securityRequirementApp)
+                .components(components)
                 .servers(List.of(devServer, prodServer));
     }
 }
