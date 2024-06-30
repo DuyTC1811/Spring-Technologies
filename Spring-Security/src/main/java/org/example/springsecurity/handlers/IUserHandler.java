@@ -1,12 +1,11 @@
 package org.example.springsecurity.handlers;
 
-import org.example.springsecurity.configurations.security.UserDetailsImpl;
 import org.example.springsecurity.requests.LoginRequest;
-import org.example.springsecurity.requests.RegisterUserRequest;
+import org.example.springsecurity.requests.SignupReq;
 import org.example.springsecurity.responses.LoginResponse;
-import org.example.springsecurity.responses.RegisterUserResponse;
+import org.example.springsecurity.responses.SignupResp;
 
 public interface IUserHandler {
-    RegisterUserResponse registerUser(RegisterUserRequest registerRequest);
+    SignupResp signup(SignupReq registerRequest);
     LoginResponse login(LoginRequest loginRequest);
 }
