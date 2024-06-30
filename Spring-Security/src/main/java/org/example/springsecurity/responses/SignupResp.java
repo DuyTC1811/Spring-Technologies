@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class RegisterUserResponse {
+public class SignupResp {
     private String token;
     private String resetToken;
 }
