@@ -11,10 +11,9 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class UserDetailsImpl implements UserDetails {
+public class UserInfo implements UserDetails {
     private String userId;
     private String username;
-    private String userCode;
     private String password;
     private String email;
     private String phone;
@@ -61,7 +60,7 @@ public class UserDetailsImpl implements UserDetails {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserDetailsImpl user = (UserDetailsImpl) o;
+        UserInfo user = (UserInfo) o;
         return Objects.equals(userId, user.userId);
     }
 }
