@@ -102,7 +102,7 @@ public class JwtUtil {
      * @param request HttpServletRequest chứa JWT
      * @return JWT token nếu tìm thấy, null nếu không tìm thấy
      */
-    public static String parseJwt(HttpServletRequest request) {
+    public String parseJwt(HttpServletRequest request) {
         String value = request.getHeader("Authorization");
         if (value != null && value.startsWith("Bearer ")) {
             return value.substring(7);
