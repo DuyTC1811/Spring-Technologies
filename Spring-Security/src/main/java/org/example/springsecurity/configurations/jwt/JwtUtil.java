@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -77,23 +78,21 @@ public class JwtUtil {
     /**
      * Phương thức kiểm tra tính hợp lệ của JWT token
      *
-     * @param authToken JWT token cần kiểm tra
+     * @param token JWT token cần kiểm tra
+     * @param userDetails Thông tin chi tiết người dùng để so sánh
      * @return boolean giá trị true nếu token hợp lệ, false nếu không hợp lệ
      */
-    public boolean validateJwtToken(String authToken) {
-        if (authToken == null || authToken.trim().isEmpty()) {
-            return false;
-        }
-        try {
-            Jwts.parser()
-                    .verifyWith(generalSigningKey())
-                    .build()
-                    .parseSignedClaims(authToken);
-            return true;
-        } catch (JwtException exception) {
-            LOGGER.error("[ JWT ] validation error: {}", exception.getMessage());
-        }
-        return false;
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     /**
