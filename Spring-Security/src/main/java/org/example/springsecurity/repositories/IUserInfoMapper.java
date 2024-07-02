@@ -1,12 +1,13 @@
 package org.example.springsecurity.repositories;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.example.springsecurity.configurations.security.UserInfo;
-import org.example.springsecurity.repositories.providers.UserSqlProvider;
 
 @Mapper
 public interface IUserInfoMapper {
-    @SelectProvider(type = UserSqlProvider.class, method = "selectUsers")
-    UserInfo findByUsername(String name);
+
+    @Select("SELECT * FROM users us WHERE us.username = #{username}")
+    UserInfo findByUsername(@Param("username") String username);
 }

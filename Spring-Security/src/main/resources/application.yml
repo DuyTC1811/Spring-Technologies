@@ -7,17 +7,17 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: anhduy12
-    type: com.zaxxer.hikari.HikariDataSource
     hikari:
       auto-commit: true
       idle-timeout: 20000
       maximum-pool-size: 2
       max-lifetime: 200000
       connection-timeout: 20000
-      pool-name: Connect ===>
+      pool-name: '[ CONNECT ] ===>'
 
   liquibase:
     change-log: classpath:liquibase/main-changelog.yml
+
     clear-checksums: true
   security:
     jwtSecret: duytc123
