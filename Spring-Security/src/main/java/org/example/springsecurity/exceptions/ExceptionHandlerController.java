@@ -12,8 +12,8 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ExceptionResponse> handlerResponse(BaseException exception) {
-        LOGGER.error(exception.getMessage(), exception);
-        var response = new ExceptionResponse(exception.getCode() ,exception.getMessage());
+        LOGGER.error("[ EXCEPTION ] {}", exception.getMessage());
+        var response = new ExceptionResponse(exception.getCode(), exception.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 }
