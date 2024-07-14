@@ -3,6 +3,7 @@ package org.example.springsecurity.configurations.security;
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.configurations.jwt.AuthEntryPointJwt;
 import org.example.springsecurity.configurations.jwt.AuthTokenFilter;
+import org.example.springsecurity.exceptions.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -44,7 +45,7 @@ public class SecurityConfig {
                                     "/v3/api-docs/**",
                                     "/swagger-resources/**",
                                     "/webjars/**").permitAll()
-                            .requestMatchers("api/auth/**").permitAll()
+                            .requestMatchers("/api/auth/**").permitAll()
                             .anyRequest().authenticated())
 
                     .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);  // JWT filter
@@ -52,7 +53,7 @@ public class SecurityConfig {
 
         } catch (Exception exception) {
             LOGGER.error("[ ERROR ] Configuring SecurityFilterChain {}", exception.getLocalizedMessage());
-            return null;
+            throw new BaseException(400, "Lỗi hệ thông vui lòng thử lại sau");
         }
     }
 

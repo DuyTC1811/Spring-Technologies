@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,6 +17,9 @@ public class SignupReq {
 
     @Schema(description = "Password", example = "duytc")
     private String password;
+
+    @Schema(description = "Confirm Password", example = "duytc")
+    private String confirmPassword;
 
     @Schema(description = "Số điện thoại", example = "0902288686")
     private String mobile;

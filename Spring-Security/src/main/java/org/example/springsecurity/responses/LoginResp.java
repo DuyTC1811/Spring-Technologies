@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class SignupResp {
-    private String messenger;
+public class LoginResp {
+    private String accessToken;
+    private String refreshToken;
 }

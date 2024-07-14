@@ -1,10 +1,16 @@
 package org.example.springsecurity.exceptions;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AccountStatusException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.security.SignatureException;
 
 @RestControllerAdvice
 public class ExceptionHandlerController {
@@ -15,5 +21,37 @@ public class ExceptionHandlerController {
         LOGGER.error("[ EXCEPTION ] {}", exception.getMessage());
         var response = new ExceptionResponse(exception.getCode(), exception.getMessage());
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponse> handleSecurityException(Exception exception) {
+
+        if (exception instanceof BadCredentialsException) {
+            return handlerResponse(401, exception.getMessage(), "The username or password is incorrect");
+        }
+
+        if (exception instanceof AccountStatusException) {
+            return handlerResponse(403, exception.getMessage(), "The account is locked");
+        }
+
+        if (exception instanceof AccessDeniedException) {
+            return handlerResponse(403, exception.getMessage(), "You are not authorized to access this resource");
+        }
+
+        if (exception instanceof SignatureException) {
+            return handlerResponse(403, exception.getMessage(), "The JWT signature is invalid");
+        }
+
+        if (exception instanceof ExpiredJwtException) {
+            return handlerResponse(403, exception.getMessage(), "The JWT token has expired");
+        }
+
+        return handlerResponse(500, exception.getMessage(), "Unknown internal server error.");
+    }
+
+    private ResponseEntity<ExceptionResponse> handlerResponse(int code, String detail, String description) {
+        LOGGER.error("[ EXCEPTION-JWT ] {}", description);
+        ExceptionResponse response = new ExceptionResponse(code, detail, description);
+        return ResponseEntity.status(code).body(response);
     }
 }

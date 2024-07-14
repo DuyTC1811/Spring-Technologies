@@ -15,10 +15,9 @@ public class UserInfo implements UserDetails {
     private String userId;
     private String username;
     private String password;
+    private String status;
     private String email;
-    private String phone;
-    private boolean enabled;
-    private boolean accountNonLocked;
+    private String mobile;
     private Set<GrantedAuthority> authorities;
 
     @Override
@@ -43,7 +42,7 @@ public class UserInfo implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return accountNonLocked;
+        return true;
     }
 
     @Override
@@ -53,7 +52,7 @@ public class UserInfo implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return true;
     }
 
     @Override
