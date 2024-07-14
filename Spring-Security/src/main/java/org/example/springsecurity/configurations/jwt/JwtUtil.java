@@ -1,12 +1,12 @@
 package org.example.springsecurity.configurations.jwt;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParserBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.example.springsecurity.exceptions.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,27 +15,36 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    @Value("${spring.security.jwtSecret}")
-    private String secretKey;
-    @Value("${spring.security.expiration-time}")
-    private int expirationTime;
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtUtil.class);
+    @Value("${spring.security.asset-token}")
+    private String secretAssetToken;
+    @Value("${spring.security.asset-token-time}")
+    private int tokenExpiryTime;
+
+    @Value("${spring.security.refresh-token}")
+    private String secretRefreshToken;
+    @Value("${spring.security.refresh-token-time}")
+    private int refreshExpiryTime;
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String generateToken(String username, Set<String> roles) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", roles);
-        return createToken(claims, username, expirationTime);
+    public String generateToken(String username, Map<String, Object> claims) {
+        return createToken(claims, username, secretAssetToken, tokenExpiryTime);
+    }
+
+    public String refreshToken(String username) {
+        Map<String, Object> claims = Map.of(
+                "username", username
+        );
+        return createToken(claims, username, secretRefreshToken, refreshExpiryTime);
     }
 
 
@@ -47,19 +56,21 @@ public class JwtUtil {
     /**
      * Phương thức tạo Token
      *
-     * @param claims              thông tin cần thêm
-     * @param subject             token này là của ai
-     * @param tokenExpirationTime thời hạn token này có thể tồn tại (millisecond)
+     * @param claims         thông tin cần thêm
+     * @param subject        token này là của ai
+     * @param expirationTime thời hạn token này có thể tồn tại (millisecond)
      * @return trả về một chuỗi token
      */
-    private String createToken(Map<String, Object> claims, String subject, long tokenExpirationTime) {
-        return Jwts.builder()
+    private String createToken(Map<String, Object> claims, String subject, String secretKey, long expirationTime) {
+        String newToken = Jwts.builder()
                 .subject(subject)
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + tokenExpirationTime))
-                .signWith(generalSigningKey())
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(generalSigningKey(secretKey))
                 .compact();
+        LOGGER.info("[ GENERATE-TOKEN ] [ {} ] - {}", subject, newToken);
+        return newToken;
     }
 
     /**
@@ -69,7 +80,7 @@ public class JwtUtil {
      * @return thông tin bên trong JWT
      */
     private Claims extractAllClaims(String token) {
-        JwtParserBuilder parserBuilder = Jwts.parser().verifyWith(generalSigningKey());
+        JwtParserBuilder parserBuilder = Jwts.parser().verifyWith(generalSigningKey(secretAssetToken));
         return parserBuilder.build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -109,8 +120,12 @@ public class JwtUtil {
         return null;
     }
 
-    private SecretKey generalSigningKey() {
+    private SecretKey generalSigningKey(String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        if (keyBytes.length < 32) { // 32 bytes = 256 bits
+            LOGGER.error("The key byte array is too short. It must be at least 256 bits (32 bytes) long. {}", secretKey);
+            throw new BaseException(400, "Lỗi hệ thông vui lòng thử lại sau");
+        }
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
