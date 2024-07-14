@@ -6,6 +6,7 @@ import org.example.springsecurity.configurations.jwt.AuthTokenFilter;
 import org.example.springsecurity.exceptions.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,6 +28,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfig.class);
+
+    @Value("${cors.allowed.origins}")
+    private String allowedOrigins;
+
+    @Value("${cors.allowed.methods}")
+    private String allowedMethods;
+
+    @Value("${cors.allowed.headers}")
+    private String allowedHeaders;
+
     private final AuthEntryPointJwt unauthorizedHandler;
     private final AuthTokenFilter authTokenFilter;
 
@@ -59,12 +70,12 @@ public class SecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-        configuration.setAllowedMethods(List.of("GET", "POST"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(allowedOrigins.replace(" ", "").split(",")));
+        config.setAllowedMethods(List.of(allowedMethods.replace(" ", "").split(",")));
+        config.setAllowedHeaders(List.of(allowedHeaders.replace(" ", "").split(",")));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 

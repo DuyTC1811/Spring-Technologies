@@ -42,4 +42,3 @@ cors:
     origins: "http://localhost:4200"
     methods: "GET,POST,PUT,DELETE"
     headers: "Content-Type,Authorization"
-
