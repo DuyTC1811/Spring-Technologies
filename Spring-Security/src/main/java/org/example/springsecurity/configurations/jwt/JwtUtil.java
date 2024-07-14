@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.springsecurity.exceptions.BaseException;
+import org.example.springsecurity.models.GenerateTokenInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -33,23 +35,28 @@ public class JwtUtil {
 
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, secretAssetToken, Claims::getSubject);
     }
 
-    public String generateToken(String username, Map<String, Object> claims) {
-        return createToken(claims, username, secretAssetToken, tokenExpiryTime);
+    public String generateToken(GenerateTokenInfo info) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", info.getEmail());
+        claims.put("phone", info.getPhone());
+        String assetToken = createToken(claims, info.getUsername(), secretAssetToken, tokenExpiryTime);
+        LOGGER.info("[ ASSET-TOKEN ] - {}", assetToken);
+        return assetToken;
     }
 
     public String refreshToken(String username) {
-        Map<String, Object> claims = Map.of(
-                "username", username
-        );
-        return createToken(claims, username, secretRefreshToken, refreshExpiryTime);
+        Map<String, Object> claims = Map.of("username", username);
+        String refreshToken = createToken(claims, username, secretRefreshToken, refreshExpiryTime);
+        LOGGER.info("[ REFRESH-TOKEN ] - {}", refreshToken);
+        return refreshToken;
     }
 
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
+    public <T> T extractClaim(String token, String secretKey, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token, secretKey);
         return claimsResolver.apply(claims);
     }
 
@@ -62,15 +69,13 @@ public class JwtUtil {
      * @return trả về một chuỗi token
      */
     private String createToken(Map<String, Object> claims, String subject, String secretKey, long expirationTime) {
-        String newToken = Jwts.builder()
+        return Jwts.builder()
                 .subject(subject)
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(generalSigningKey(secretKey))
                 .compact();
-        LOGGER.info("[ GENERATE-TOKEN ] [ {} ] - {}", subject, newToken);
-        return newToken;
     }
 
     /**
@@ -79,8 +84,8 @@ public class JwtUtil {
      * @param token JWT token cần trích xuất claims
      * @return thông tin bên trong JWT
      */
-    private Claims extractAllClaims(String token) {
-        JwtParserBuilder parserBuilder = Jwts.parser().verifyWith(generalSigningKey(secretAssetToken));
+    private Claims extractAllClaims(String token, String secretKey) {
+        JwtParserBuilder parserBuilder = Jwts.parser().verifyWith(generalSigningKey(secretKey));
         return parserBuilder.build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -89,21 +94,25 @@ public class JwtUtil {
     /**
      * Phương thức kiểm tra tính hợp lệ của JWT token
      *
-     * @param token JWT token cần kiểm tra
+     * @param token       JWT token cần kiểm tra
      * @param userDetails Thông tin chi tiết người dùng để so sánh
      * @return boolean giá trị true nếu token hợp lệ, false nếu không hợp lệ
      */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(userDetails.getUsername())) && isTokenExpired(token, secretAssetToken);
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    public boolean isReFreshTokenValid(String token) {
+        return isTokenExpired(token, secretRefreshToken);
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    private boolean isTokenExpired(String token, String secretKey) {
+        return !extractExpiration(token, secretKey).before(new Date());
+    }
+
+    private Date extractExpiration(String token, String secretKey) {
+        return extractClaim(token, secretKey, Claims::getExpiration);
     }
 
     /**

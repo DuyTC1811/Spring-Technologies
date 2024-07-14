@@ -1,16 +1,13 @@
 package org.example.springsecurity.responses;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
-
 @Getter
 @Setter
+@AllArgsConstructor
 public class RefreshTokenResp {
-    private String tokenId;
-    private String userId;
-    private String token;
-    private Instant expiryDate;
-
+    private String accessToken;
+    private String refreshToken;
 }

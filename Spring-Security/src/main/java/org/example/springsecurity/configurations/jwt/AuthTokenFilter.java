@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.configurations.security.UserInfoServiceImpl;
+import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.repositories.ITokenStorageMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,6 +42,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 var userDetails = userDetailsService.loadUserByUsername(username);
 
                 if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
+
+                    String status = tokenStorageMapper.findAssetToken(jwtToken);
+                    if ("INACTIVE".equals(status)) {
+                        throw new BaseException(403, "Token của bạn không hợp lệ vui lòng đăng nhập lại");
+                    }
+
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails,                  // Principal: thông tin người dùng
                             null,                         // Credentials: mật khẩu của người dùng (nếu dùng JWT thì không cần thiết)

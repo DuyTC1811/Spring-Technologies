@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.configurations.jwt.JwtUtil;
 import org.example.springsecurity.configurations.security.UserInfo;
 import org.example.springsecurity.exceptions.BaseException;
+import org.example.springsecurity.models.GenerateTokenInfo;
+import org.example.springsecurity.models.TokenStorageInfo;
 import org.example.springsecurity.repositories.IAuthenticationMapper;
 import org.example.springsecurity.repositories.ITokenStorageMapper;
 import org.example.springsecurity.requests.LoginReq;
@@ -22,8 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -64,10 +64,11 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     }
 
     @Override
+    @Transactional
     public LoginResp login(LoginReq loginReq) {
         UserInfo userInfo = authMapper.findByUsername(loginReq.getUsername());
         if (Objects.isNull(userInfo)) {
-            throw new RuntimeException("tai khoan mat khau khong dung");
+            throw new BaseException(400, "tai khoan mat khau khong dung");
         }
 
         if (!passwordEncoder.matches(loginReq.getPassword(), userInfo.getPassword())) {
@@ -78,10 +79,12 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 //            throw new RuntimeException("Tai khoan chua duoc kich hoat");
 //        }
 
-        Map<String, Object> value = new HashMap<>();
-        value.put("email", userInfo.getEmail());
-        value.put("phone", userInfo.getMobile());
-        String accessToken = jwtUtil.generateToken(userInfo.getUsername(), value);
+        GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
+                .username(userInfo.getUsername())
+                .email(userInfo.getEmail())
+                .phone(userInfo.getMobile())
+                .build();
+        String accessToken = jwtUtil.generateToken(generateTokenInfo);
         String refreshToken = jwtUtil.refreshToken(userInfo.getUsername());
 
         TokenStorageReq tokenStorage = TokenStorageReq.builder()
@@ -96,7 +99,24 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
 
     @Override
+    @Transactional
     public RefreshTokenResp refreshToken(RefreshTokenReq request) {
+        if (jwtUtil.isReFreshTokenValid(request.getRefreshToken())) {
+            TokenStorageInfo tokenInfo = tokenStorageMapper.findReFreshToken(request.getRefreshToken());
+            if ("INACTIVE".equals(tokenInfo.getStatus())) {
+                throw new BaseException(400, "Đã bị hủy");
+            }
+
+            GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
+                    .username(tokenInfo.getUsername())
+                    .email(tokenInfo.getEmail())
+                    .phone(tokenInfo.getMobile())
+                    .build();
+
+            String accessToken = jwtUtil.generateToken(generateTokenInfo);
+            tokenStorageMapper.updateReFreshToken(accessToken, request.getRefreshToken(), tokenInfo.getCoutRefresh() + 1);
+            return new RefreshTokenResp(accessToken, request.getRefreshToken());
+        }
         return null;
     }
 

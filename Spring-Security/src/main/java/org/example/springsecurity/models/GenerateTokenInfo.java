@@ -1,14 +1,14 @@
 package org.example.springsecurity.models;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class TokenStorageInfo {
+@Builder
+public class GenerateTokenInfo {
     private String username;
     private String email;
-    private String mobile;
-    private String status;
-    private int coutRefresh;
+    private String phone;
 }
