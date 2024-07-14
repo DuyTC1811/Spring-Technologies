@@ -20,8 +20,10 @@ spring:
 
     clear-checksums: true
   security:
-    jwtSecret: duytc123
-    expiration-time: 900000
+    asset-token: 9QZaVt1gRjmNWtEPksgNaJ7OT6OmnbNQxxx334sdeaFxxx1
+    asset-token-time: 900000
+    refresh-token: 9QZaVt1gRjmNWtEPksgNaJ7OT6OmnbNQxxx334sdeaFxxx2
+    refresh-token-time: 900000
 
 springdoc:
   api-docs:
