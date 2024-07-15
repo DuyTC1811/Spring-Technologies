@@ -43,9 +43,9 @@ public class EmployeeController {
 
 
             //Print all of the collected data.
-            log.info("All Employees--> " + employees.get());
-            log.info("Employee By Id--> " + employee.get());
-            log.info("Employee Role By Id--> " + employeeRole.get());
+            log.info("All Employees --> {}", employees.get());
+            log.info("Employee By Id --> {}" , employee.get());
+            log.info("Employee Role By Id --> {}", employeeRole.get());
 
             return new ResponseEntity<>("The async example worked perfectly!", HttpStatus.OK);
 

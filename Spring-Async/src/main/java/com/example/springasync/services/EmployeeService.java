@@ -36,18 +36,18 @@ public class EmployeeService {
 
         //added delay for test async
         Thread.sleep(6000L);
-        log.info("------getAllEmployees completed-----");
+        log.info("------ [ GET ALL EMPLOYEES COMPLETED ] -----");
         return CompletableFuture.completedFuture(employees);
     }
 
     @Async("asyncTaskExecutor")
     public CompletableFuture<Employee> getEmployeeById() throws InterruptedException {
-        log.info("------getEmployeeById started-----");
+        log.info("------[GET EMPLOYEE BY ID STARTED]-----");
 
         //To obtain records, we can add logic that calls another service or database.
         Thread.sleep(2000L);
 
-        log.info("------getEmployeeById completed-----");
+        log.info("------[GET EMPLOYEE BY ID COMPLETED]-----");
 
         return CompletableFuture.completedFuture(Employee.builder()
                 .name("TechGeekNextUser")
@@ -63,7 +63,7 @@ public class EmployeeService {
         //To obtain records, we can add logic that calls another service or database.
         Thread.sleep(4000L);
 
-        log.info("------getEmployeeRoleById completed-----");
+        log.info("------[ GET EMPLOYEE ROLE BY ID COMPLETED]-----");
 
         return CompletableFuture.completedFuture("Admin");
     }
