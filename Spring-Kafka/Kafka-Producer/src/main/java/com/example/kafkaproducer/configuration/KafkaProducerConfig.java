@@ -1,6 +1,5 @@
 package com.example.kafkaproducer.configuration;
 
-import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +26,8 @@ public class KafkaProducerConfig {
         configProps.put(BOOTSTRAP_SERVERS_CONFIG, port);
         configProps.put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        // Đảm bảo tất cả các replica xác nhận
+        configProps.put("acks", "all");
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 

@@ -4,6 +4,6 @@ server:
 spring:
   kafka:
     consumer:
-      bootstrap-servers: localhost:9092
-      enable-auto-commit: true
+      bootstrap-servers: localhost:29092
+      enable-auto-commit: # tự động commit offset
 

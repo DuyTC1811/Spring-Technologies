@@ -9,7 +9,7 @@ public class KafkaConsumer {
 
     @KafkaListener(topics = "test", groupId = "0")
     public void consumer(ConsumerRecord<String, String> record) {
-        System.out.printf("Received message: topic=%s, partition=%d, offset=%d, key=%s, value=%s",
+        System.out.printf("[ RECEIVED ] message: [ TOPIC ] = %s, [ PARTITION ] = %d, [ OFFSET ] = %d, [ KEY ] = %s, [ VALUE ] =%s",
                 record.topic(), record.partition(), record.offset(), record.key(), record.value());
     }
 }

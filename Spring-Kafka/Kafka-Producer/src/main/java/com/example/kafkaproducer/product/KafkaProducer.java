@@ -5,8 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.CompletableFuture;
 
 import static com.example.kafkaproducer.util.ConverterStringUntil.converterToString;
 
@@ -24,7 +28,14 @@ public class KafkaProducer {
 
     public void push(Customer customer) {
         String data = converterToString(customer);
-        kafkaTemplate.send(topic, data);
-        LOGGER.debug("Info {}", customer);
+        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, "key-test", data);
+
+        future.whenComplete((result, exception) -> {
+            if (exception == null) {
+                LOGGER.info("Sent message=[ {} ] with offset=[ {} ]", data, result.getRecordMetadata().offset());
+            } else {
+                LOGGER.info("Unable to send message = [ {} ] due to", data);
+            }
+        });
     }
 }
