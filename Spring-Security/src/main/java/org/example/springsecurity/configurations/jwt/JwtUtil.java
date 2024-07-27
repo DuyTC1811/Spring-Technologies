@@ -23,9 +23,9 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtUtil.class);
-    @Value("${spring.security.asset-token}")
-    private String secretAssetToken;
-    @Value("${spring.security.asset-token-time}")
+    @Value("${spring.security.access-token}")
+    private String secretAccessToken;
+    @Value("${spring.security.access-token-time}")
     private int tokenExpiryTime;
 
     @Value("${spring.security.refresh-token}")
@@ -35,15 +35,15 @@ public class JwtUtil {
 
 
     public String extractUsername(String token) {
-        return extractClaim(token, secretAssetToken, Claims::getSubject);
+        return extractClaim(token, secretAccessToken, Claims::getSubject);
     }
 
     public String generateToken(GenerateTokenInfo info) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", info.getEmail());
         claims.put("phone", info.getPhone());
-        String assetToken = createToken(claims, info.getUsername(), secretAssetToken, tokenExpiryTime);
-        LOGGER.info("[ ASSET-TOKEN ] - {}", assetToken);
+        String assetToken = createToken(claims, info.getUsername(), secretAccessToken, tokenExpiryTime);
+        LOGGER.info("[ ACCESS-TOKEN ] - {}", assetToken);
         return assetToken;
     }
 
@@ -100,7 +100,7 @@ public class JwtUtil {
      */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && isTokenExpired(token, secretAssetToken);
+        return (username.equals(userDetails.getUsername())) && isTokenExpired(token, secretAccessToken);
     }
 
     public boolean isReFreshTokenValid(String token) {

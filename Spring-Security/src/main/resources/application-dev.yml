@@ -20,8 +20,8 @@ spring:
 
     clear-checksums: true
   security:
-    asset-token: 9QZaVt1gRjmNWtEPksgNaJ7OT6OmnbNQxxx334sdeaFxxx1
-    asset-token-time: 900000
+    access-token: 9QZaVt1gRjmNWtEPksgNaJ7OT6OmnbNQxxx334sdeaFxxx1
+    access-token-time: 900000
     refresh-token: 9QZaVt1gRjmNWtEPksgNaJ7OT6OmnbNQxxx334sdeaFxxx2
     refresh-token-time: 900000
 
