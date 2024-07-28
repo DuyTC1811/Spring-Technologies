@@ -15,6 +15,9 @@ public interface ITokenStorageMapper {
     @Update("UPDATE token_storage SET status = 'INACTIVE', logout_date = CURRENT_TIMESTAMP WHERE asset_token = #{assetToken}")
     void killToken(String assetToken);
 
+    @Update("UPDATE token_storage SET status = 'INACTIVE', logout_date = CURRENT_TIMESTAMP WHERE username = #{username}")
+    void killTokenByUsername(String username);
+
     @Select("SELECT status FROM token_storage WHERE asset_token = #{assetToken}")
     String findAssetToken(String assetToken);
 

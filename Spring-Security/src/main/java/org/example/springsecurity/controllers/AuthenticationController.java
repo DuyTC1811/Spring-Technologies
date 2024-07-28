@@ -7,16 +7,23 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.handlers.IAuthenticationHandler;
+import org.example.springsecurity.requests.ForgotPasswordReq;
 import org.example.springsecurity.requests.LoginReq;
 import org.example.springsecurity.requests.RefreshTokenReq;
 import org.example.springsecurity.requests.SignupReq;
+import org.example.springsecurity.requests.UpdatePasswordReq;
+import org.example.springsecurity.requests.ValidateTokenReq;
+import org.example.springsecurity.responses.ForgotPasswordResp;
 import org.example.springsecurity.responses.LoginResp;
 import org.example.springsecurity.responses.LogoutResp;
 import org.example.springsecurity.responses.RefreshTokenResp;
 import org.example.springsecurity.responses.SignupResp;
+import org.example.springsecurity.responses.UpdatePasswordResp;
+import org.example.springsecurity.responses.ValidateTokenResp;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,10 +57,32 @@ public class AuthenticationController {
         return ResponseEntity.ok().body(new LogoutResp("Logout Successfully"));
     }
 
-    @PostMapping("/reset-token")
+    @Operation(summary = "LẤY LẠI TOKEN MỚI")
+    @PutMapping("/reset-token")
     public ResponseEntity<RefreshTokenResp> refreshToken(@RequestBody RefreshTokenReq request) {
         RefreshTokenResp response = authentication.refreshToken(request);
         return ResponseEntity.ok().body(response);
+    }
+
+    @Operation(summary = "THAY ĐỔI PASSWORD")
+    @PutMapping("/update-password")
+    public ResponseEntity<UpdatePasswordResp> updatePassword(@RequestBody UpdatePasswordReq request) {
+        UpdatePasswordResp response = authentication.updatePassword(request);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @Operation(summary = "KIỂM TRA TOKEN")
+    @PostMapping("/validate-token")
+    public ResponseEntity<ValidateTokenResp> validateToken(@RequestBody ValidateTokenReq request) {
+        ValidateTokenResp resp = authentication.validateToken(request);
+        return ResponseEntity.ok().body(resp);
+    }
+
+    @Operation(summary = "LẤY LẠI PASSWORD")
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ForgotPasswordResp> forgotPassword(@RequestBody ForgotPasswordReq request, HttpServletRequest httpRequest) {
+        ForgotPasswordResp resp = authentication.forgotPassword(request, httpRequest);
+        return ResponseEntity.ok().body(resp);
     }
 
 }

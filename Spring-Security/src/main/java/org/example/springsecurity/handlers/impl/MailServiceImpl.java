@@ -17,8 +17,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -30,6 +32,8 @@ public class MailServiceImpl implements IMailService {
 
     @Value("${spring.mail.mail-from}")
     private String mailFrom;
+
+
 
     // TODO @Async
     @Override
@@ -56,5 +60,14 @@ public class MailServiceImpl implements IMailService {
             LOGGER.error("[ SEND-MAIL-ERROR ] ", exception);
             throw new BaseException(400, exception.getMessage());
         }
+    }
+
+    @Override
+    public void sendMailForgotPassword(String token, String emailSendTo) {
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        Map<String, Object> model = new HashMap<>();
+        model.put("token", token);
+        model.put("baseUrl", baseUrl);
+        sendMail(EMailTemplate.TEMPLATE_FOR_GOT_PASSWORD, emailSendTo, model);
     }
 }

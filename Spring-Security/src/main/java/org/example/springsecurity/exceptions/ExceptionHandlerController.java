@@ -1,6 +1,8 @@
 package org.example.springsecurity.exceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -46,11 +48,15 @@ public class ExceptionHandlerController {
         if (exception instanceof ExpiredJwtException) {
             return handlerResponse(HttpStatus.FORBIDDEN.value(), exception.getMessage(), "The JWT token has expired");
         }
+
+        if (exception instanceof MalformedJwtException) {
+            return handlerResponse(HttpStatus.FORBIDDEN.value(), exception.getMessage(), "Invalid compact JWT string");
+        }
         return null;
     }
 
     private ResponseEntity<ExceptionResponse> handlerResponse(int code, String detail, String description) {
-        LOGGER.error("[ EXCEPTION-JWT ] - {}", description);
+        LOGGER.error("[ EXCEPTION-JWT ] - {}", detail);
         ExceptionResponse response = new ExceptionResponse(code, detail, description);
         return ResponseEntity.status(code).body(response);
     }

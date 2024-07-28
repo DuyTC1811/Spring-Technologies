@@ -11,6 +11,8 @@ import org.example.springsecurity.models.GenerateTokenInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +46,14 @@ public class JwtUtil {
         claims.put("phone", info.getPhone());
         String assetToken = createToken(claims, info.getUsername(), secretAccessToken, tokenExpiryTime);
         LOGGER.info("[ ACCESS-TOKEN ] - {}", assetToken);
+        return assetToken;
+    }
+
+    public String generateToken(GenerateTokenInfo info, int expiryTime) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", info.getEmail());
+        String assetToken = createToken(claims, info.getUsername(), secretAccessToken, expiryTime);
+        LOGGER.info("[ TOKEN-FORGOT-PASSWORD ] - {}", assetToken);
         return assetToken;
     }
 
@@ -103,6 +113,10 @@ public class JwtUtil {
         return (username.equals(userDetails.getUsername())) && isTokenExpired(token, secretAccessToken);
     }
 
+    public boolean isTokenValid(String token) {
+        return isTokenExpired(token, secretAccessToken);
+    }
+
     public boolean isReFreshTokenValid(String token) {
         return isTokenExpired(token, secretRefreshToken);
     }
@@ -137,4 +151,27 @@ public class JwtUtil {
         }
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    public String usernameByContext() {
+        String username = "";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            LOGGER.error("Authentication is null");
+            return username;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails userDetails) {
+            username = userDetails.getUsername();
+        } else {
+            // Nếu principal không phải là một instance của UserDetails, ghi log lỗi
+            if (principal == null) {
+                LOGGER.error("Principal is null");
+            } else {
+                LOGGER.error("Principal is not an instance of UserDetails, it is an instance of: {}", principal.getClass().getName());
+            }
+        }
+        return username;
+    }
+
 }

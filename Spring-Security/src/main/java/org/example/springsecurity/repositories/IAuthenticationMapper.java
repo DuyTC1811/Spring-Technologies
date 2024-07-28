@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.example.springsecurity.configurations.security.UserInfo;
 import org.example.springsecurity.requests.SignupReq;
 
@@ -23,4 +24,10 @@ public interface IAuthenticationMapper {
 
     @Insert("INSERT INTO users (user_id, username, password, mobile, email) VALUES (#{uuid}, #{username}, #{password}, #{mobile}, #{email})")
     void signup(SignupReq request);
+
+    @Select("SELECT password FROM users WHERE username = #{username}")
+    String findPasswordByUserName(@Param("username") String username);
+
+    @Update("UPDATE users SET password = #{newPassword} WHERE username = #{username}")
+    void updatePassword(String username, String newPassword);
 }
