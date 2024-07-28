@@ -1,4 +1,4 @@
-package org.example.springsecurity.handlers;
+package org.example.springsecurity.handlers.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.configurations.jwt.JwtUtil;
 import org.example.springsecurity.configurations.security.UserInfo;
 import org.example.springsecurity.exceptions.BaseException;
+import org.example.springsecurity.handlers.IAuthenticationHandler;
 import org.example.springsecurity.models.GenerateTokenInfo;
 import org.example.springsecurity.models.TokenStorageInfo;
 import org.example.springsecurity.repositories.IAuthenticationMapper;
