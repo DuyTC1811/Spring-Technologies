@@ -9,10 +9,11 @@ spring:
     password: anhduy12
     hikari:
       auto-commit: true
-      idle-timeout: 20000
-      maximum-pool-size: 2
-      max-lifetime: 200000
-      connection-timeout: 20000
+      minimum-idle: 1            # Số lượng kết nối nhàn rỗi tối thiểu
+      maximum-pool-size: 5       # Số lượng kết nối tối đa
+      idle-timeout: 60000        # Thời gian chờ nhàn rỗi (60 giây)
+      max-lifetime: 200000       # Thời gian sống tối đa của kết nối (200 giây)
+      connection-timeout: 20000  # Thời gian chờ kết nối (20 giây)
       pool-name: '[ CONNECT ] ===>'
 
   liquibase:
@@ -30,7 +31,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: hulkhulk1245@gmail.com
-    password: ""
+    password: tcjdgzuimnyzrfsi
     mail-from: hulkhulk1245@gmail.com
     protocol: smtp
     test-connection: true
@@ -62,4 +63,11 @@ cors:
     origins: "http://localhost:4200"
     methods: "GET,POST,PUT,DELETE"
     headers: "Content-Type,Authorization"
+  permit-all:
+    endpoint:
+      /swagger-ui/**,
+      /v3/api-docs/**,
+      /swagger-resources/**,
+      /webjars/**,
+      /api/auth/**,
 

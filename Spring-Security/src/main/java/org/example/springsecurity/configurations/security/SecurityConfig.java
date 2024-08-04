@@ -40,11 +40,15 @@ public class SecurityConfig {
     @Value("${cors.allowed.headers}")
     private String allowedHeaders;
 
+    @Value("${cors.permit-all.endpoint}")
+    private String endpoint;
+
     private final AuthEntryPointJwt unauthorizedHandler;
     private final AuthTokenFilter authTokenFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) {
+        String[] endpoints = endpoint.replace(" ", "").split(",");
         try {
             httpSecurity
                     .csrf(AbstractHttpConfigurer::disable)                                  // Disable CSRF protection)
@@ -53,12 +57,7 @@ public class SecurityConfig {
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                     .authorizeHttpRequests(authorize -> authorize
-                            .requestMatchers(
-                                    "/swagger-ui/**",
-                                    "/v3/api-docs/**",
-                                    "/swagger-resources/**",
-                                    "/webjars/**").permitAll()
-                            .requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers(endpoints).permitAll()
                             .anyRequest().authenticated())
 
                     .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);  // JWT filter

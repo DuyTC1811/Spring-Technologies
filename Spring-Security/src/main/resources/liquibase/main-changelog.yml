@@ -1,13 +1,42 @@
 databaseChangeLog:
-  - includeAll:
-      path: changelog/changelog-table
-      relativeToChangelogFile: true
-#  - includeAll:
-#      file: changelog-index
-#      relativeToChangelogFile: true
-#  - includeAll:
-#      file: changelog-procedure
-#      relativeToChangelogFile: true
-#  - includeAll:
-#      file: changelog-view
-#      relativeToChangelogFile: true
+  - changeSet:
+      id: 1
+      author: DUYTC
+      changes:
+        - sqlFile:
+            path: liquibase/changelog/changelog-table/01-table-roles.sql
+
+  - changeSet:
+      id: 2
+      author: DUYTC
+      changes:
+        - sqlFile:
+            path: liquibase/changelog/changelog-table/02-table-user.sql
+
+  - changeSet:
+      id: 3
+      author: DUYTC
+      changes:
+        - sqlFile:
+            path: liquibase/changelog/changelog-table/03-table-permissions.sql
+
+  - changeSet:
+      id: 4
+      author: DUYTC
+      changes:
+        - sqlFile:
+            path: liquibase/changelog/changelog-table/04-table-user-role.sql
+
+  - changeSet:
+      id: 5
+      author: DUYTC
+      changes:
+        - sqlFile:
+            path: liquibase/changelog/changelog-table/05-table-role-permissions.sql
+
+  - changeSet:
+      id: 6
+      author: DUYTC
+      changes:
+        - sqlFile:
+            path: liquibase/changelog/changelog-table/06-table-token-storage.sql
