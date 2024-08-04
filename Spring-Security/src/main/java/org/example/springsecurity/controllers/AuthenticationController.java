@@ -38,14 +38,14 @@ public class AuthenticationController {
 
     @Operation(summary = "ĐĂNG KÝ TÀI KHOẢN")
     @PostMapping("/signup")
-    public ResponseEntity<SignupResp> signup(@Valid @RequestBody SignupReq request) {
+    public ResponseEntity<SignupResp> signup(@RequestBody @Valid SignupReq request) {
         var response = authentication.signup(request);
         return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "ĐĂNG NHẬP TÀI KHOẢN")
     @PostMapping("/login")
-    public ResponseEntity<LoginResp> login(@RequestBody LoginReq loginReq) {
+    public ResponseEntity<LoginResp> login(@RequestBody @Valid LoginReq loginReq) {
         LoginResp loginResp = authentication.login(loginReq);
         return ResponseEntity.ok().body(loginResp);
     }
@@ -59,28 +59,28 @@ public class AuthenticationController {
 
     @Operation(summary = "LẤY LẠI TOKEN MỚI")
     @PutMapping("/reset-token")
-    public ResponseEntity<RefreshTokenResp> refreshToken(@RequestBody RefreshTokenReq request) {
+    public ResponseEntity<RefreshTokenResp> refreshToken(@RequestBody @Valid RefreshTokenReq request) {
         RefreshTokenResp response = authentication.refreshToken(request);
         return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "THAY ĐỔI PASSWORD")
     @PutMapping("/update-password")
-    public ResponseEntity<UpdatePasswordResp> updatePassword(@RequestBody UpdatePasswordReq request) {
+    public ResponseEntity<UpdatePasswordResp> updatePassword(@RequestBody @Valid UpdatePasswordReq request) {
         UpdatePasswordResp response = authentication.updatePassword(request);
         return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "KIỂM TRA TOKEN")
     @PostMapping("/validate-token")
-    public ResponseEntity<ValidateTokenResp> validateToken(@RequestBody ValidateTokenReq request) {
+    public ResponseEntity<ValidateTokenResp> validateToken(@RequestBody @Valid ValidateTokenReq request) {
         ValidateTokenResp resp = authentication.validateToken(request);
         return ResponseEntity.ok().body(resp);
     }
 
     @Operation(summary = "LẤY LẠI PASSWORD")
     @PostMapping("/forgot-password")
-    public ResponseEntity<ForgotPasswordResp> forgotPassword(@RequestBody ForgotPasswordReq request, HttpServletRequest httpRequest) {
+    public ResponseEntity<ForgotPasswordResp> forgotPassword(@RequestBody @Valid ForgotPasswordReq request, HttpServletRequest httpRequest) {
         ForgotPasswordResp resp = authentication.forgotPassword(request, httpRequest);
         return ResponseEntity.ok().body(resp);
     }
