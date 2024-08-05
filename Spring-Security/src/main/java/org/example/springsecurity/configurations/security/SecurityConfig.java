@@ -48,7 +48,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) {
-        String[] endpoints = endpoint.replace(" ", "").split(",");
+        String[] endpointPermitAll = replaceAll(endpoint);
         try {
             httpSecurity
                     .csrf(AbstractHttpConfigurer::disable)                                  // Disable CSRF protection)
@@ -57,7 +57,7 @@ public class SecurityConfig {
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                     .authorizeHttpRequests(authorize -> authorize
-                            .requestMatchers(endpoints).permitAll()
+                            .requestMatchers(endpointPermitAll).permitAll()
                             .anyRequest().authenticated())
 
                     .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);  // JWT filter
@@ -72,9 +72,9 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(allowedOrigins.replace(" ", "").split(",")));
-        config.setAllowedMethods(List.of(allowedMethods.replace(" ", "").split(",")));
-        config.setAllowedHeaders(List.of(allowedHeaders.replace(" ", "").split(",")));
+        config.setAllowedOrigins(List.of(replaceAll(allowedOrigins)));
+        config.setAllowedMethods(List.of(replaceAll(allowedMethods)));
+        config.setAllowedHeaders(List.of(replaceAll(allowedHeaders)));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
@@ -83,6 +83,10 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    public String[] replaceAll(String value) {
+        return value.replace(" ", "").split(",");
     }
 
 }

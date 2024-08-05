@@ -70,6 +70,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         request.setPassword(passwordEncoder.encode(request.getPassword()));
 
         authMapper.signup(request);
+        // TODO send Email
         return new SignupResp("Register Success");
     }
 
