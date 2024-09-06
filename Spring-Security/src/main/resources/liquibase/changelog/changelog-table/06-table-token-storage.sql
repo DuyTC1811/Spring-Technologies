@@ -1,3 +1,6 @@
+--liquibase formatted sql
+
+--changeset DUYTC:01
 CREATE TABLE IF NOT EXISTS token_storage
 (
     token_id          VARCHAR(36)   NOT NULL,

@@ -1,3 +1,6 @@
+--liquibase formatted sql
+
+--changeset DUYTC:01
 CREATE TABLE permissions
 (
     per_id       VARCHAR(36) PRIMARY KEY,

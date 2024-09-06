@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "AUTHENTICATION & AUTHORIZATION", description = "API XÁC THỰC VÀ PHÂN QUYỀN")
@@ -40,7 +42,7 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<SignupResp> signup(@RequestBody @Valid SignupReq request) {
         var response = authentication.signup(request);
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.status(CREATED).body(response);
     }
 
     @Operation(summary = "ĐĂNG NHẬP TÀI KHOẢN")

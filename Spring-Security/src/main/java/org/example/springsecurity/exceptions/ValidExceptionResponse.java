@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Getter
 @Setter
-public class ExceptionResponse {
+public class ValidExceptionResponse {
     @JsonFormat(
             shape = JsonFormat.Shape.STRING,
             pattern = "dd-MM-yyyy HH:MM:SS",
@@ -17,9 +18,9 @@ public class ExceptionResponse {
     private LocalDateTime timestamp = LocalDateTime.now();
     private Integer code;
     private String detail;
-    private String description;
+    private Map<String, Object> description;
 
-    public ExceptionResponse(int code, String detail, String description) {
+    public ValidExceptionResponse(int code, String detail, Map<String, Object> description) {
         this.code = code;
         this.detail = detail;
         this.description = description;

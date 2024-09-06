@@ -1,3 +1,6 @@
+--liquibase formatted sql
+
+--changeset DUYTC:01
 CREATE TABLE IF NOT EXISTS user_role
 (
     user_id      VARCHAR(36) NOT NULL,
@@ -7,7 +10,7 @@ CREATE TABLE IF NOT EXISTS user_role
     PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES users (user_id),
     FOREIGN KEY (role_id) REFERENCES roles (role_id)
-    );
+);
 
 COMMENT ON TABLE user_role IS 'BẢNG LƯU TRỮ THÔNG TIN USER ROLES';
 COMMENT ON COLUMN user_role.user_id IS 'ID BẢN USERS';

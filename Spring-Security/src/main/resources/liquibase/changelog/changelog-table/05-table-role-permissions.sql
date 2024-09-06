@@ -1,3 +1,6 @@
+--liquibase formatted sql
+
+--changeset DUYTC:01
 CREATE TABLE role_permissions
 (
     role_id    VARCHAR(36) NOT NULL,

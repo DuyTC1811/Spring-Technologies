@@ -1,3 +1,6 @@
+--liquibase formatted sql
+
+--changeset DUYTC:01
 CREATE TABLE IF NOT EXISTS roles
 (
     role_id      VARCHAR(36) PRIMARY KEY,

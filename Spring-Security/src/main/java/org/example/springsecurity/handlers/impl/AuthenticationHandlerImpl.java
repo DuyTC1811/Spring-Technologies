@@ -8,6 +8,7 @@ import org.example.springsecurity.configurations.security.UserInfo;
 import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.handlers.IAuthenticationHandler;
 import org.example.springsecurity.handlers.IMailService;
+import org.example.springsecurity.handlers.IRoleHandler;
 import org.example.springsecurity.models.GenerateTokenInfo;
 import org.example.springsecurity.models.TokenStorageInfo;
 import org.example.springsecurity.repositories.IAuthenticationMapper;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.example.springsecurity.enums.EException.USER_ALREADY_EXISTS;
@@ -43,6 +45,7 @@ import static org.example.springsecurity.enums.EException.USER_ALREADY_EXISTS;
 public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     private final JwtUtil jwtUtil;
     private final IAuthenticationMapper authMapper;
+    private final IRoleHandler roleHandler;
     private final ITokenStorageMapper tokenStorageMapper;
 
     private final IMailService mailService;
@@ -66,10 +69,13 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         if (authMapper.isExistsMobile(request.getMobile())) {
             throw new BaseException(USER_ALREADY_EXISTS);
         }
-        request.setUuid(UUID.randomUUID().toString());
+        String userId = UUID.randomUUID().toString();
+        request.setUuid(userId);
         request.setPassword(passwordEncoder.encode(request.getPassword()));
 
         authMapper.signup(request);
+        Set<String> roleIds = roleHandler.finByRoleName(request.getRoles());
+        roleHandler.insertUserRole(userId, roleIds);
         // TODO send Email
         return new SignupResp("Register Success");
     }
