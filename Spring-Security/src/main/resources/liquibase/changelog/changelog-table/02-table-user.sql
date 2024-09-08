@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users
     mobile            VARCHAR(15)  NOT NULL UNIQUE,
     status            VARCHAR(20)  NOT NULL        DEFAULT 'AWAITING',
     email             VARCHAR(50)  NOT NULL UNIQUE,
+    registration      VARCHAR(15)  NOT NULL,
     password          VARCHAR(255) NOT NULL,
     created_date      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_date      TIMESTAMP    NULL
@@ -19,6 +20,7 @@ COMMENT ON COLUMN users.username IS 'TÀI KHOẢN USER NAME';
 COMMENT ON COLUMN users.mobile IS 'SỐ ĐIỆN THOẠI';
 COMMENT ON COLUMN users.status IS 'TRẠN THÁI TÀI KHOẢN: ACTIVE, INACTIVE, AWAITING';
 COMMENT ON COLUMN users.email IS 'ĐỊA CHỈ EMAIL';
+COMMENT ON COLUMN users.registration IS 'NGUỒN ĐĂNG KÝ: FACEBOOK, GOOGLE, MANUAL';
 COMMENT ON COLUMN users.password IS 'MẬT KHẨU';
 COMMENT ON COLUMN users.created_date IS 'NGÀY ĐĂNG KÝ';
 COMMENT ON COLUMN users.updated_date IS 'NGÀY SỬA ĐỔI';

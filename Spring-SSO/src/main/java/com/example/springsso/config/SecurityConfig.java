@@ -1,15 +1,11 @@
-package org.example.springsecurity.configurations.security;
+package com.example.springsso.config;
 
 import lombok.RequiredArgsConstructor;
-import org.example.springsecurity.configurations.jwt.AuthEntryPointJwt;
-import org.example.springsecurity.configurations.jwt.AuthTokenFilter;
-import org.example.springsecurity.exceptions.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,7 +13,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -27,7 +22,6 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableMethodSecurity
 public class SecurityConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityConfig.class);
 
@@ -43,31 +37,34 @@ public class SecurityConfig {
     @Value("${cors.permit-all.endpoint}")
     private String endpoint;
 
-    private final AuthEntryPointJwt unauthorizedHandler;
-    private final AuthTokenFilter authTokenFilter;
+    private final OAuth2Service oAuth2Service;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         String[] endpointPermitAll = replaceAll(endpoint);
-        try {
-            httpSecurity
-                    .csrf(AbstractHttpConfigurer::disable)                                  // Disable CSRF protection)
-                    .cors(cors -> cors.configurationSource(corsConfigurationSource()))      // Enable CORS with custom configuration
-                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                    .authorizeHttpRequests(authorize -> authorize
-                            .requestMatchers(endpointPermitAll).permitAll()
-                            .anyRequest().authenticated())
+        httpSecurity
+                .csrf(AbstractHttpConfigurer::disable)                                  // Disable CSRF protection
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))      // Enable CORS with custom configuration
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(endpointPermitAll).permitAll()
+                        .anyRequest().authenticated()
+                )
 
-                    .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(unauthorizedHandler))
-                    .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);  // JWT filter
-            return httpSecurity.build();
+                // Config OAuth2
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2Service))
+                );
 
-        } catch (Exception exception) {
-            LOGGER.error("[ ERROR ] Configuring SecurityFilterChain {}", exception.getLocalizedMessage());
-            throw new BaseException(400, "Lỗi hệ thông vui lòng thử lại sau");
-        }
+                // Handling authentication
+//                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(unauthorizedHandler))
+
+                // Thêm JWT filter trước UsernamePasswordAuthenticationFilter
+//                .addFilterBefore(null, UsernamePasswordAuthenticationFilter.class);
+
+        return httpSecurity.build();
     }
 
     @Bean
@@ -81,13 +78,13 @@ public class SecurityConfig {
         return source;
     }
 
+    public String[] replaceAll(String value) {
+        return value.replace(" ", "").split(",");
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    public String[] replaceAll(String value) {
-        return value.replace(" ", "").split(",");
     }
 
 }
