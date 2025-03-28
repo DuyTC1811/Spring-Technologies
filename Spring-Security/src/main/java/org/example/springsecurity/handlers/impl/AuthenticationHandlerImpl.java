@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.configurations.jwt.JwtUtil;
 import org.example.springsecurity.configurations.security.UserInfo;
+import org.example.springsecurity.configurations.security.UserInfoServiceImpl;
 import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.handlers.IAuthenticationHandler;
 import org.example.springsecurity.handlers.IRoleHandler;
@@ -24,6 +25,7 @@ import org.example.springsecurity.responses.RefreshTokenResp;
 import org.example.springsecurity.responses.SignupResp;
 import org.example.springsecurity.responses.UpdatePasswordResp;
 import org.example.springsecurity.responses.ValidateTokenResp;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,12 +42,16 @@ import static org.example.springsecurity.enums.EException.USER_ALREADY_EXISTS;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationHandlerImpl implements IAuthenticationHandler {
+    @Value("${spring.security.refresh-token}")
+    private String secretRefreshToken;
+
     private final JwtUtil jwtUtil;
     private final IAuthenticationMapper authMapper;
     private final IRoleHandler roleHandler;
     private final ITokenStorageMapper tokenStorageMapper;
+    private final UserInfoServiceImpl userDetailsService;
 
-//    private final IMailService mailService;
+    //    private final IMailService mailService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -98,7 +104,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
                 .version(userInfo.getTokenVersion())
                 .build();
         String accessToken = jwtUtil.generateToken(generateTokenInfo);
-        String refreshToken = jwtUtil.refreshToken(userInfo.getUsername());
+        String refreshToken = jwtUtil.refreshToken(generateTokenInfo);
         return new LoginResp(accessToken, refreshToken);
     }
 
@@ -106,23 +112,26 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     @Override
     @Transactional
     public RefreshTokenResp refreshToken(RefreshTokenReq request) {
-        if (jwtUtil.isReFreshTokenValid(request.getRefreshToken())) {
-            TokenStorageInfo tokenInfo = tokenStorageMapper.findReFreshToken(request.getRefreshToken());
-            if ("INACTIVE".equals(tokenInfo.getStatus())) {
-                throw new BaseException(400, "Đã bị hủy");
-            }
-
-            GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
-                    .username(tokenInfo.getUsername())
-//                    .email(tokenInfo.getEmail())
-//                    .version(tokenInfo.getMobile())
-                    .build();
-
-            String accessToken = jwtUtil.generateToken(generateTokenInfo);
-            tokenStorageMapper.updateReFreshToken(accessToken, request.getRefreshToken(), tokenInfo.getCoutRefresh() + 1);
-            return new RefreshTokenResp(accessToken, request.getRefreshToken());
+        if (!jwtUtil.isReFreshTokenValid(request.getRefreshToken())) {
+            throw new BaseException(403, "Token của bạn không hợp lệ vui lòng đăng nhập lại");
         }
-        return null;
+
+        Integer version = jwtUtil.extractVersion(request.getRefreshToken(), secretRefreshToken);
+        String username = jwtUtil.extractUsername(request.getRefreshToken(), secretRefreshToken);
+        var userDetails = userDetailsService.loadUserByUsername(username);
+
+        if (version != userDetails.getTokenVersion()) {
+            throw new BaseException(403, "Token của bạn không hợp lệ vui lòng đăng nhập lại");
+        }
+
+        GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
+                .username(userDetails.getUsername())
+                .version(userDetails.getTokenVersion())
+                .build();
+
+        String accessToken = jwtUtil.generateToken(generateTokenInfo);
+        String refreshToken = jwtUtil.refreshToken(generateTokenInfo);
+        return new RefreshTokenResp(accessToken, refreshToken);
     }
 
     @Override

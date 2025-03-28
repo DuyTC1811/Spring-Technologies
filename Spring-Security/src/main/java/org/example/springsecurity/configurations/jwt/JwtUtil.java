@@ -38,17 +38,19 @@ public class JwtUtil {
     private int refreshExpiryTime;
 
 
-    public String extractUsername(String token) {
-        return extractClaim(token, secretAccessToken, Claims::getSubject);
+    public String extractUsername(String token, String secret) {
+        return extractClaim(token, secret, Claims::getSubject);
     }
 
-    public Integer extractVersion(String token) {
-        return extractClaim(token, secretAccessToken, claims -> claims.get("version", Integer.class));
+    public Integer extractVersion(String token, String secret) {
+        return extractClaim(token, secret, claims -> claims.get("version", Integer.class));
     }
 
     public String generateToken(GenerateTokenInfo info) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("version", info.getVersion());
+        Map<String, Object> claims = Map.of(
+                "username", info.getUsername(),
+                "version", info.getVersion()
+        );
         String assetToken = createToken(claims, info.getUsername(), secretAccessToken, tokenExpiryTime);
         LOGGER.info("[ ACCESS-TOKEN ] - {}", assetToken);
         return assetToken;
@@ -61,9 +63,12 @@ public class JwtUtil {
         return assetToken;
     }
 
-    public String refreshToken(String username) {
-        Map<String, Object> claims = Map.of("username", username);
-        String refreshToken = createToken(claims, username, secretRefreshToken, refreshExpiryTime);
+    public String refreshToken(GenerateTokenInfo info) {
+        Map<String, Object> claims = Map.of(
+                "username", info.getUsername(),
+                "version", info.getVersion()
+        );
+        String refreshToken = createToken(claims, info.getUsername(), secretRefreshToken, refreshExpiryTime);
         LOGGER.info("[ REFRESH-TOKEN ] - {}", refreshToken);
         return refreshToken;
     }
@@ -115,7 +120,7 @@ public class JwtUtil {
      * @return boolean giá trị true nếu token hợp lệ, false nếu không hợp lệ
      */
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
+        final String username = extractUsername(token, secretAccessToken);
         return (username.equals(userDetails.getUsername())) && isTokenExpired(token, secretAccessToken);
     }
 

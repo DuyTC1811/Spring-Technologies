@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.configurations.security.UserInfoServiceImpl;
 import org.example.springsecurity.exceptions.BaseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,9 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @Component
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
+    @Value("${spring.security.access-token}")
+    private String secretAccessToken;
+
     private final JwtUtil jwtUtil;
     private final UserInfoServiceImpl userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
@@ -36,8 +40,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 return;
             }
 
-            var username = jwtUtil.extractUsername(jwtToken);
-            var tokenVersion = jwtUtil.extractVersion(jwtToken);
+            var username = jwtUtil.extractUsername(jwtToken, secretAccessToken);
+            var tokenVersion = jwtUtil.extractVersion(jwtToken, secretAccessToken);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (username != null && authentication == null) {
