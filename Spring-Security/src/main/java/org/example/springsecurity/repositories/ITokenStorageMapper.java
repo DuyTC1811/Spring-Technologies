@@ -2,6 +2,7 @@ package org.example.springsecurity.repositories;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.example.springsecurity.models.TokenStorageInfo;
@@ -15,8 +16,8 @@ public interface ITokenStorageMapper {
     @Update("UPDATE token_storage SET status = 'INACTIVE', logout_date = CURRENT_TIMESTAMP WHERE asset_token = #{assetToken}")
     void killToken(String assetToken);
 
-    @Update("UPDATE token_storage SET status = 'INACTIVE', logout_date = CURRENT_TIMESTAMP WHERE username = #{username}")
-    void killTokenByUsername(String username);
+    @Update("UPDATE USERS SET TOKEN_VERSION = TOKEN_VERSION + 1 WHERE USERNAME = #{username}")
+    void updateTokenVersion(@Param("username") String username);
 
     @Select("SELECT status FROM token_storage WHERE asset_token = #{assetToken}")
     String findAssetToken(String assetToken);

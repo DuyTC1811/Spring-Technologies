@@ -95,8 +95,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
         GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
                 .username(userInfo.getUsername())
-                .email(userInfo.getEmail())
-                .version(userInfo.getMobile())
+                .version(userInfo.getTokenVersion())
                 .build();
         String accessToken = jwtUtil.generateToken(generateTokenInfo);
         String refreshToken = jwtUtil.refreshToken(userInfo.getUsername());
@@ -115,8 +114,8 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
             GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
                     .username(tokenInfo.getUsername())
-                    .email(tokenInfo.getEmail())
-                    .version(tokenInfo.getMobile())
+//                    .email(tokenInfo.getEmail())
+//                    .version(tokenInfo.getMobile())
                     .build();
 
             String accessToken = jwtUtil.generateToken(generateTokenInfo);
@@ -128,15 +127,15 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
     @Override
     public UpdatePasswordResp updatePassword(UpdatePasswordReq request) {
-       String username = jwtUtil.usernameByContext();
-        String passwordOld = authMapper.findPasswordByUserName(username);
+        UserInfo userInfo = jwtUtil.usernameByContext();
+        String passwordOld = authMapper.findPasswordByUserName(userInfo.getUsername());
         if (!passwordEncoder.matches(request.getPasswordOld(), passwordOld) || passwordOld == null) {
             throw new BaseException(400, "tai khoan mat khau khong dung");
         }
 
-        authMapper.updatePassword(username, passwordEncoder.encode(request.getNewPassword()));
-        // Kill token By Username
-        tokenStorageMapper.killTokenByUsername(username);
+        authMapper.updatePassword(userInfo.getUsername(), passwordEncoder.encode(request.getNewPassword()));
+        // Update Version Token
+        tokenStorageMapper.updateTokenVersion(userInfo.getUsername());
         return new UpdatePasswordResp("Successfully updated password");
     }
 
@@ -156,7 +155,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         }
         GenerateTokenInfo tokenInfo = GenerateTokenInfo.builder()
                 .username(userInfo.getUsername())
-                .email(userInfo.getEmail())
+//                .email(userInfo.getEmail())
                 .build();
         String generateToken = jwtUtil.generateToken(tokenInfo, 10 * 60);
 

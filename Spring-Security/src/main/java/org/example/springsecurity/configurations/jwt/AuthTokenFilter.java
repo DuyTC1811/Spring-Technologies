@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.configurations.security.UserInfoServiceImpl;
 import org.example.springsecurity.exceptions.BaseException;
-import org.example.springsecurity.repositories.ITokenStorageMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,7 +21,6 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 public class AuthTokenFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserInfoServiceImpl userDetailsService;
-    private final ITokenStorageMapper tokenStorageMapper;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
 
@@ -30,8 +28,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain)
-    {
+            @NonNull FilterChain filterChain) {
         var jwtToken = jwtUtil.parseJwt(request);
         try {
             if (jwtToken == null) {
@@ -40,6 +37,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             }
 
             var username = jwtUtil.extractUsername(jwtToken);
+            var tokenVersion = jwtUtil.extractVersion(jwtToken);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (username != null && authentication == null) {
@@ -47,8 +45,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
 
-                    String status = tokenStorageMapper.findAssetToken(jwtToken);
-                    if ("INACTIVE".equals(status)) {
+                    //TODO Check Black List
+
+                    //TODO check version
+                    if (userDetails.getTokenVersion() != tokenVersion) {
                         throw new BaseException(403, "Token của bạn không hợp lệ vui lòng đăng nhập lại");
                     }
 

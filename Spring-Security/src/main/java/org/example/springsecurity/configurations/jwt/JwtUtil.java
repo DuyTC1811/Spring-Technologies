@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.example.springsecurity.configurations.security.UserInfo;
 import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.models.GenerateTokenInfo;
 import org.slf4j.Logger;
@@ -41,9 +42,12 @@ public class JwtUtil {
         return extractClaim(token, secretAccessToken, Claims::getSubject);
     }
 
+    public Integer extractVersion(String token) {
+        return extractClaim(token, secretAccessToken, claims -> claims.get("version", Integer.class));
+    }
+
     public String generateToken(GenerateTokenInfo info) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", info.getEmail());
         claims.put("version", info.getVersion());
         String assetToken = createToken(claims, info.getUsername(), secretAccessToken, tokenExpiryTime);
         LOGGER.info("[ ACCESS-TOKEN ] - {}", assetToken);
@@ -52,7 +56,6 @@ public class JwtUtil {
 
     public String generateToken(GenerateTokenInfo info, int expiryTime) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", info.getEmail());
         String assetToken = createToken(claims, info.getUsername(), secretAccessToken, expiryTime);
         LOGGER.info("[ TOKEN-FORGOT-PASSWORD ] - {}", assetToken);
         return assetToken;
@@ -155,8 +158,8 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String usernameByContext() {
-        String username = "";
+    public UserInfo usernameByContext() {
+        UserInfo username = new UserInfo();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             LOGGER.error("Authentication is null");
@@ -164,8 +167,8 @@ public class JwtUtil {
         }
 
         Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails userDetails) {
-            username = userDetails.getUsername();
+        if (principal instanceof UserInfo userDetails) {
+            username = userDetails;
         } else {
             // Nếu principal không phải là một instance của UserDetails, ghi log lỗi
             if (principal == null) {

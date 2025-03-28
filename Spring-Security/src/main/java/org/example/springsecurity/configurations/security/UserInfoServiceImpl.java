@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class UserInfoServiceImpl implements UserDetailsService {
     private final IAuthenticationMapper authMapper;
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserInfo loadUserByUsername(String username) {
         UserInfo userInfo = authMapper.findByUsername(username);
         if (userInfo == null) {
             throw new UsernameNotFoundException(username);

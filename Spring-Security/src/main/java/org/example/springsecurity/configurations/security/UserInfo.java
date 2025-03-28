@@ -16,9 +16,11 @@ public class UserInfo implements UserDetails {
     private String username;
     private String password;
     private String status;
-    private String email;
-    private String mobile;
+    private int tokenVersion;
     private Set<GrantedAuthority> authorities;
+
+    public UserInfo() {
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
