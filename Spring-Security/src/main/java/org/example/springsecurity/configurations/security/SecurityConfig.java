@@ -57,6 +57,10 @@ public class SecurityConfig {
 
                     .authorizeHttpRequests(authorize -> authorize
                             .requestMatchers(endpointPermitAll).permitAll()
+                            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                            .requestMatchers("/api/user/**").hasAnyRole("USER")
+                            .requestMatchers("/api/technique/**").hasAnyRole("TECHNIQUE")
+                            .requestMatchers("/api/staff/**").hasAnyRole("STAFF")
                             .anyRequest().authenticated())
 
 

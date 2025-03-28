@@ -12,4 +12,6 @@ public interface IRoleMapper {
     void insertUserRole(
             @Param("userId") String userId,
             @Param("roleIds") Set<String> roleIds);
+
+    Set<String> findRoleByUserId(@Param("userId") String userId);
 }

@@ -65,7 +65,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     private final ITokenStorageMapper tokenStorageMapper;
     private final UserInfoServiceImpl userDetailsService;
 
-    //    private final IMailService mailService;
+    // private final IMailService mailService;
     private final PasswordEncoder passwordEncoder;
 
     @Override

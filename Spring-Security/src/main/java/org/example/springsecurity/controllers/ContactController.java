@@ -16,7 +16,7 @@ import java.util.Map;
 public class ContactController {
 //    private final IMailService mailService;
 
-    @GetMapping("/contact")
+    @GetMapping("/staff/contact")
     public String getContact() {
         Map<String, Object> model = new HashMap<>();
         model.put("name", "DUYTC");

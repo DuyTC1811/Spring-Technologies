@@ -19,7 +19,7 @@ public class LoansController {
         return "This Loan Controller";
     }
 
-    @GetMapping("/password")
+    @GetMapping("/technique/password")
     public String getPassword() {
         UserDetails userDetails = User.withUsername("DuyTC")
                 .username("DuyTC")

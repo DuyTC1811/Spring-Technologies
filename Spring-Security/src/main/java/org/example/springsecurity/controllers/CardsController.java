@@ -14,7 +14,7 @@ import java.util.Collection;
 @RequestMapping(path = "/api")
 @RequiredArgsConstructor
 public class CardsController {
-    @GetMapping("/card")
+    @GetMapping("/user/card")
     public String getCards() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String name = authentication.getName();
