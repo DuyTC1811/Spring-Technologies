@@ -138,6 +138,12 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
         String accessToken = jwtUtil.generateToken(generateTokenInfo);
         String refreshToken = jwtUtil.refreshToken(generateTokenInfo);
+
+        String jti = jwtUtil.extractJti(request.getRefreshToken(), secretRefreshToken);
+        String tokenKey = "blacklist:" + jti.hashCode();
+        Date expiration = jwtUtil.extractExpiration(request.getRefreshToken(), secretAccessToken);
+        // Add token to blacklist
+        cacheService.putCache(jti, tokenKey, expiration.getTime());
         return new RefreshTokenResp(accessToken, refreshToken);
     }
 
