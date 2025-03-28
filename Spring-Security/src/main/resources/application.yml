@@ -25,6 +25,8 @@ spring:
     access-token-time: 900000
     refresh-token: 9QZaVt1gRjmNWtEPksgNaJ7OT6OmnbNQxxx334sdeaFxxx2
     refresh-token-time: 900000
+    verified-token: 9QZaVt1gRjmNWtEPksgNaJ7OT6OmnbNQxxx334sdeaFxxx3
+    verified-token-time: 900000
 
 #  mail:
 #    default-encoding: UTF-8

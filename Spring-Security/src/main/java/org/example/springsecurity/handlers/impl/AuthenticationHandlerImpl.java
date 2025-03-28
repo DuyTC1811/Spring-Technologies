@@ -43,11 +43,20 @@ import static org.example.springsecurity.enums.EException.USER_ALREADY_EXISTS;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationHandlerImpl implements IAuthenticationHandler {
-    @Value("${spring.security.refresh-token}")
-    private String secretRefreshToken;
-
     @Value("${spring.security.access-token}")
-    private String secretAccessToken;
+    private String accessSecretToken;
+    @Value("${spring.security.access-token-time}")
+    private int accessExpiryTime;
+
+    @Value("${spring.security.refresh-token}")
+    private String refreshSecretToken;
+    @Value("${spring.security.refresh-token-time}")
+    private int refreshExpiryTime;
+
+    @Value("${spring.security.verified-token}")
+    private String verifiedToken;
+    @Value("${spring.security.verified-token-time}")
+    private int verifiedTokenTime;
 
     private final JwtUtil jwtUtil;
     private final IRoleHandler roleHandler;
@@ -107,9 +116,14 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username(userInfo.getUsername())
+                .accessKey(accessSecretToken)
+                .accessExpireTime(accessExpiryTime)
+                .refreshKey(refreshSecretToken)
+                .refreshExpireTime(refreshExpiryTime)
                 .version(userInfo.getTokenVersion())
                 .build();
-        String accessToken = jwtUtil.generateToken(generateTokenInfo);
+
+        String accessToken = jwtUtil.accessToken(generateTokenInfo);
         String refreshToken = jwtUtil.refreshToken(generateTokenInfo);
         return new LoginResp(accessToken, refreshToken);
     }
@@ -118,12 +132,12 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     @Override
     @Transactional
     public RefreshTokenResp refreshToken(RefreshTokenReq request) {
-        if (!jwtUtil.isReFreshTokenValid(request.getRefreshToken())) {
+        if (jwtUtil.isTokenValid(request.getRefreshToken(), refreshSecretToken)) {
             throw new BaseException(403, "Token của bạn không hợp lệ vui lòng đăng nhập lại");
         }
 
-        Integer version = jwtUtil.extractVersion(request.getRefreshToken(), secretRefreshToken);
-        String username = jwtUtil.extractUsername(request.getRefreshToken(), secretRefreshToken);
+        Integer version = jwtUtil.extractVersion(request.getRefreshToken(), refreshSecretToken);
+        String username = jwtUtil.extractUsername(request.getRefreshToken(), refreshSecretToken);
         var userDetails = userDetailsService.loadUserByUsername(username);
 
         if (version != userDetails.getTokenVersion()) {
@@ -133,15 +147,19 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username(userDetails.getUsername())
+                .accessKey(accessSecretToken)
+                .accessExpireTime(accessExpiryTime)
+                .refreshKey(refreshSecretToken)
+                .refreshExpireTime(refreshExpiryTime)
                 .version(userDetails.getTokenVersion())
                 .build();
 
-        String accessToken = jwtUtil.generateToken(generateTokenInfo);
+        String accessToken = jwtUtil.accessToken(generateTokenInfo);
         String refreshToken = jwtUtil.refreshToken(generateTokenInfo);
 
-        String jti = jwtUtil.extractJti(request.getRefreshToken(), secretRefreshToken);
+        String jti = jwtUtil.extractJti(request.getRefreshToken(), refreshSecretToken);
         String tokenKey = "blacklist:" + jti.hashCode();
-        Date expiration = jwtUtil.extractExpiration(request.getRefreshToken(), secretAccessToken);
+        Date expiration = jwtUtil.extractExpiration(request.getRefreshToken(), refreshSecretToken);
         // Add token to blacklist
         cacheService.putCache(jti, tokenKey, expiration.getTime());
         return new RefreshTokenResp(accessToken, refreshToken);
@@ -163,7 +181,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
     @Override
     public ValidateTokenResp validateToken(ValidateTokenReq request) {
-        if (!jwtUtil.isTokenValid(request.getToken())) {
+        if (!jwtUtil.isTokenValid(request.getToken(), verifiedToken)) {
             throw new BaseException(403, "Token invalid");
         }
         return new ValidateTokenResp("Successfully validated token");
@@ -176,12 +194,13 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
             throw new BaseException(400, "tài khoản của bạn không tồn tại");
         }
         GenerateTokenInfo tokenInfo = GenerateTokenInfo.builder()
+                .uuid(UUID.randomUUID().toString())
                 .username(userInfo.getUsername())
-//                .email(userInfo.getEmail())
                 .build();
-//        String generateToken = jwtUtil.generateToken(tokenInfo, 10 * 60);
+        String generateToken = jwtUtil.verifiedToken(tokenInfo, verifiedToken, verifiedTokenTime);
 
-//        mailService.sendMailForgotPassword(generateToken, userInfo.getEmail());
+        // TODO send mail
+        // mailService.sendMailForgotPassword(generateToken, userInfo.getEmail());
         return new ForgotPasswordResp("Successfully forgot password");
     }
 
@@ -194,9 +213,9 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
             SecurityContextHolder.clearContext();
         }
         String assetToken = jwtUtil.parseJwt(request);
-        String jti = jwtUtil.extractJti(assetToken, secretAccessToken);
+        String jti = jwtUtil.extractJti(assetToken, accessSecretToken);
         String tokenKey = "blacklist:" + jti.hashCode();
-        Date expiration = jwtUtil.extractExpiration(assetToken, secretAccessToken);
+        Date expiration = jwtUtil.extractExpiration(assetToken, accessSecretToken);
         // Add token to blacklist
         cacheService.putCache(jti, tokenKey, expiration.getTime());
     }

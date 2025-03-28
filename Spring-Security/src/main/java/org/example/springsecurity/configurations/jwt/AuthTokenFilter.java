@@ -57,7 +57,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             if (username != null && authentication == null) {
                 var userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
+                if (jwtUtil.isTokenValid(jwtToken, secretAccessToken, userDetails)) {
 
                     //TODO check version
                     if (userDetails.getTokenVersion() != tokenVersion) {

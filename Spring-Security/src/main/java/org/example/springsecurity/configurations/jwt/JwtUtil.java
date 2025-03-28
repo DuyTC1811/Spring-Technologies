@@ -11,7 +11,6 @@ import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.models.GenerateTokenInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,51 +18,33 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtUtil.class);
-    @Value("${spring.security.access-token}")
-    private String secretAccessToken;
-    @Value("${spring.security.access-token-time}")
-    private int tokenExpiryTime;
 
-    @Value("${spring.security.refresh-token}")
-    private String secretRefreshToken;
-    @Value("${spring.security.refresh-token-time}")
-    private int refreshExpiryTime;
-
-
-    public String extractUsername(String token, String secret) {
-        return extractClaim(token, secret, Claims::getSubject);
+    public String extractUsername(String token, String secretKey) {
+        return extractClaim(token, secretKey, Claims::getSubject);
     }
 
-    public Integer extractVersion(String token, String secret) {
-        return extractClaim(token, secret, claims -> claims.get("version", Integer.class));
+    public Integer extractVersion(String token, String secretKey) {
+        return extractClaim(token, secretKey, claims -> claims.get("version", Integer.class));
     }
 
-    public String extractJti(String token, String secret) {
-        return extractClaim(token, secret, Claims::getId);
+    public String extractJti(String token, String secretKey) {
+        return extractClaim(token, secretKey, Claims::getId);
     }
 
 
-    public String generateToken(GenerateTokenInfo info) {
+    public String accessToken(GenerateTokenInfo info) {
         Map<String, Object> claims = Map.of(
                 "username", info.getUsername(),
                 "version", info.getVersion()
         );
-        String assetToken = createToken(info.getUuid(), claims, info.getUsername(), secretAccessToken, tokenExpiryTime);
+        String assetToken = createToken(info.getUuid(), claims, info.getUsername(), info.getAccessKey(), info.getAccessExpireTime());
         LOGGER.info("[ ACCESS-TOKEN ] - {}", assetToken);
-        return assetToken;
-    }
-
-    public String generateToken(GenerateTokenInfo info, int expiryTime) {
-        Map<String, Object> claims = new HashMap<>();
-        String assetToken = createToken(info.getUuid(), claims, info.getUsername(), secretAccessToken, expiryTime);
-        LOGGER.info("[ TOKEN-FORGOT-PASSWORD ] - {}", assetToken);
         return assetToken;
     }
 
@@ -72,9 +53,18 @@ public class JwtUtil {
                 "username", info.getUsername(),
                 "version", info.getVersion()
         );
-        String refreshToken = createToken(info.getUuid(), claims, info.getUsername(), secretRefreshToken, refreshExpiryTime);
+        String refreshToken = createToken(info.getUuid(), claims, info.getUsername(), info.getRefreshKey(), info.getRefreshExpireTime());
         LOGGER.info("[ REFRESH-TOKEN ] - {}", refreshToken);
         return refreshToken;
+    }
+
+    public String verifiedToken(GenerateTokenInfo info, String secretKey, int expiryTime) {
+        Map<String, Object> claims = Map.of(
+                "username", info.getUsername()
+        );
+        String token = createToken(info.getUuid(), claims, info.getUsername(), secretKey, expiryTime);
+        LOGGER.info("[ VERIFIED-TOKEN ] - {}", token);
+        return token;
     }
 
 
@@ -128,17 +118,13 @@ public class JwtUtil {
      * @param userDetails Thông tin chi tiết người dùng để so sánh
      * @return boolean giá trị true nếu token hợp lệ, false nếu không hợp lệ
      */
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token, secretAccessToken);
-        return (username.equals(userDetails.getUsername())) && isTokenExpired(token, secretAccessToken);
+    public boolean isTokenValid(String token, String secretKey, UserDetails userDetails) {
+        final String username = extractUsername(token, secretKey);
+        return (username.equals(userDetails.getUsername())) && isTokenExpired(token, secretKey);
     }
 
-    public boolean isTokenValid(String token) {
-        return isTokenExpired(token, secretAccessToken);
-    }
-
-    public boolean isReFreshTokenValid(String token) {
-        return isTokenExpired(token, secretRefreshToken);
+    public boolean isTokenValid(String token, String secretKey) {
+        return isTokenExpired(token, secretKey);
     }
 
     private boolean isTokenExpired(String token, String secretKey) {
