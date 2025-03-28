@@ -10,5 +10,5 @@ import lombok.Setter;
 public class GenerateTokenInfo {
     private String username;
     private String email;
-    private String phone;
+    private String version;
 }

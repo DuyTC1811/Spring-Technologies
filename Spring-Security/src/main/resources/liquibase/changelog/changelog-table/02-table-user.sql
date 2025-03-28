@@ -24,3 +24,10 @@ COMMENT ON COLUMN users.registration IS 'NGUỒN ĐĂNG KÝ: FACEBOOK, GOOGLE,
 COMMENT ON COLUMN users.password IS 'MẬT KHẨU';
 COMMENT ON COLUMN users.created_date IS 'NGÀY ĐĂNG KÝ';
 COMMENT ON COLUMN users.updated_date IS 'NGÀY SỬA ĐỔI';
+
+
+--changeset DUYTC:02
+ALTER TABLE users ADD token_version int DEFAULT 0 NOT NULL;
+COMMENT ON COLUMN users.token_version IS 'VERSION TOKEN DÙNG ĐỂ KIỂM TRA TOKEN HỢP LỆ HAY KHÔNG';
+ALTER TABLE users ALTER COLUMN registration SET DEFAULT 'MANUAL';
+

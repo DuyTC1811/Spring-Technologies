@@ -6,11 +6,6 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import static org.example.springsecurity.util.RegexUtil.REGEX_EMAIL;
 import static org.example.springsecurity.util.RegexUtil.REGEX_PHONE_NUMBER;
 import static org.example.springsecurity.util.RegexUtil.REGEX_USERNAME;
@@ -39,6 +34,4 @@ public class SignupReq {
     @Schema(description = "Địa chỉ email", example = "duytc@gmail.com")
     @Pattern(regexp = REGEX_EMAIL, message = "Email không hợp lệ")
     private String email;
-
-    private Set<String> roles = new HashSet<>();
 }

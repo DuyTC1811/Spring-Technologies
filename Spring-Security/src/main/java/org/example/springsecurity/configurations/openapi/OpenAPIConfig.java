@@ -88,4 +88,6 @@ public class OpenAPIConfig {
                 .components(components)
                 .servers(List.of(devServer, prodServer));
     }
+
+//    http://localhost:8080/swagger-ui/index.html
 }

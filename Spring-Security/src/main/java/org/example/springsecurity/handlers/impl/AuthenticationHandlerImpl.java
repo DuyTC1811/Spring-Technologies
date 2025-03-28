@@ -7,7 +7,6 @@ import org.example.springsecurity.configurations.jwt.JwtUtil;
 import org.example.springsecurity.configurations.security.UserInfo;
 import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.handlers.IAuthenticationHandler;
-import org.example.springsecurity.handlers.IMailService;
 import org.example.springsecurity.handlers.IRoleHandler;
 import org.example.springsecurity.models.GenerateTokenInfo;
 import org.example.springsecurity.models.TokenStorageInfo;
@@ -17,7 +16,6 @@ import org.example.springsecurity.requests.ForgotPasswordReq;
 import org.example.springsecurity.requests.LoginReq;
 import org.example.springsecurity.requests.RefreshTokenReq;
 import org.example.springsecurity.requests.SignupReq;
-import org.example.springsecurity.requests.TokenStorageReq;
 import org.example.springsecurity.requests.UpdatePasswordReq;
 import org.example.springsecurity.requests.ValidateTokenReq;
 import org.example.springsecurity.responses.ForgotPasswordResp;
@@ -32,7 +30,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Objects;
 import java.util.Set;
@@ -48,7 +45,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     private final IRoleHandler roleHandler;
     private final ITokenStorageMapper tokenStorageMapper;
 
-    private final IMailService mailService;
+//    private final IMailService mailService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -74,7 +71,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         request.setPassword(passwordEncoder.encode(request.getPassword()));
 
         authMapper.signup(request);
-        Set<String> roleIds = roleHandler.finByRoleName(request.getRoles());
+        Set<String> roleIds = roleHandler.findByRoleCode(Set.of("USER"));
         roleHandler.insertUserRole(userId, roleIds);
         // TODO send Email
         return new SignupResp("Register Success");
@@ -99,18 +96,10 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
                 .username(userInfo.getUsername())
                 .email(userInfo.getEmail())
-                .phone(userInfo.getMobile())
+                .version(userInfo.getMobile())
                 .build();
         String accessToken = jwtUtil.generateToken(generateTokenInfo);
         String refreshToken = jwtUtil.refreshToken(userInfo.getUsername());
-
-        TokenStorageReq tokenStorage = TokenStorageReq.builder()
-                .tokenId(UUID.randomUUID().toString())
-                .assetToken(accessToken)
-                .refreshToken(refreshToken)
-                .username(userInfo.getUsername())
-                .build();
-        tokenStorageMapper.insertToken(tokenStorage);
         return new LoginResp(accessToken, refreshToken);
     }
 
@@ -127,7 +116,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
             GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
                     .username(tokenInfo.getUsername())
                     .email(tokenInfo.getEmail())
-                    .phone(tokenInfo.getMobile())
+                    .version(tokenInfo.getMobile())
                     .build();
 
             String accessToken = jwtUtil.generateToken(generateTokenInfo);
@@ -171,7 +160,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
                 .build();
         String generateToken = jwtUtil.generateToken(tokenInfo, 10 * 60);
 
-        mailService.sendMailForgotPassword(generateToken, userInfo.getEmail());
+//        mailService.sendMailForgotPassword(generateToken, userInfo.getEmail());
         return new ForgotPasswordResp("Successfully forgot password");
     }
 

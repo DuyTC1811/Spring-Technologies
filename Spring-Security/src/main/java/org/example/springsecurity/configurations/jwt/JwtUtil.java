@@ -20,6 +20,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
@@ -43,7 +44,7 @@ public class JwtUtil {
     public String generateToken(GenerateTokenInfo info) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", info.getEmail());
-        claims.put("phone", info.getPhone());
+        claims.put("version", info.getVersion());
         String assetToken = createToken(claims, info.getUsername(), secretAccessToken, tokenExpiryTime);
         LOGGER.info("[ ACCESS-TOKEN ] - {}", assetToken);
         return assetToken;
@@ -80,6 +81,8 @@ public class JwtUtil {
      */
     private String createToken(Map<String, Object> claims, String subject, String secretKey, long expirationTime) {
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .issuer("http://example.org")
                 .subject(subject)
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
