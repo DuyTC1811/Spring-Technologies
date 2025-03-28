@@ -47,6 +47,8 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+	// Cache caffeine
+	implementation 'com.github.ben-manes.caffeine:caffeine:3.2.0'
 }
 
 tasks.named('test') {
