@@ -21,7 +21,6 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
 @Component
@@ -46,19 +45,24 @@ public class JwtUtil {
         return extractClaim(token, secret, claims -> claims.get("version", Integer.class));
     }
 
+    public String extractJti(String token, String secret) {
+        return extractClaim(token, secret, Claims::getId);
+    }
+
+
     public String generateToken(GenerateTokenInfo info) {
         Map<String, Object> claims = Map.of(
                 "username", info.getUsername(),
                 "version", info.getVersion()
         );
-        String assetToken = createToken(claims, info.getUsername(), secretAccessToken, tokenExpiryTime);
+        String assetToken = createToken(info.getUuid(), claims, info.getUsername(), secretAccessToken, tokenExpiryTime);
         LOGGER.info("[ ACCESS-TOKEN ] - {}", assetToken);
         return assetToken;
     }
 
     public String generateToken(GenerateTokenInfo info, int expiryTime) {
         Map<String, Object> claims = new HashMap<>();
-        String assetToken = createToken(claims, info.getUsername(), secretAccessToken, expiryTime);
+        String assetToken = createToken(info.getUuid(), claims, info.getUsername(), secretAccessToken, expiryTime);
         LOGGER.info("[ TOKEN-FORGOT-PASSWORD ] - {}", assetToken);
         return assetToken;
     }
@@ -68,7 +72,7 @@ public class JwtUtil {
                 "username", info.getUsername(),
                 "version", info.getVersion()
         );
-        String refreshToken = createToken(claims, info.getUsername(), secretRefreshToken, refreshExpiryTime);
+        String refreshToken = createToken(info.getUuid(), claims, info.getUsername(), secretRefreshToken, refreshExpiryTime);
         LOGGER.info("[ REFRESH-TOKEN ] - {}", refreshToken);
         return refreshToken;
     }
@@ -87,9 +91,14 @@ public class JwtUtil {
      * @param expirationTime thời hạn token này có thể tồn tại (millisecond)
      * @return trả về một chuỗi token
      */
-    private String createToken(Map<String, Object> claims, String subject, String secretKey, long expirationTime) {
+    private String createToken(
+            String uuid,
+            Map<String, Object> claims,
+            String subject,
+            String secretKey,
+            long expirationTime) {
         return Jwts.builder()
-                .id(UUID.randomUUID().toString())
+                .id(uuid)
                 .issuer("http://example.org")
                 .subject(subject)
                 .claims(claims)
@@ -136,7 +145,7 @@ public class JwtUtil {
         return !extractExpiration(token, secretKey).before(new Date());
     }
 
-    private Date extractExpiration(String token, String secretKey) {
+    public Date extractExpiration(String token, String secretKey) {
         return extractClaim(token, secretKey, Claims::getExpiration);
     }
 

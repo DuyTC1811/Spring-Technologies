@@ -4,6 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.example.springsecurity.configurations.caffeine.ICacheService;
 import org.example.springsecurity.configurations.security.UserInfoServiceImpl;
 import org.example.springsecurity.exceptions.BaseException;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private String secretAccessToken;
 
     private final JwtUtil jwtUtil;
+    private final ICacheService cacheService;
     private final UserInfoServiceImpl userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
@@ -40,6 +43,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 return;
             }
 
+            //TODO Check Black List
+            String jti = jwtUtil.extractJti(jwtToken, secretAccessToken);
+            String cache = cacheService.getCache(jti);
+            if (StringUtils.isNoneBlank(cache)) {
+                throw new BaseException(403, "Token của bạn không hợp lệ vui lòng đăng nhập lại");
+            }
+
             var username = jwtUtil.extractUsername(jwtToken, secretAccessToken);
             var tokenVersion = jwtUtil.extractVersion(jwtToken, secretAccessToken);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -48,8 +58,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 var userDetails = userDetailsService.loadUserByUsername(username);
 
                 if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
-
-                    //TODO Check Black List
 
                     //TODO check version
                     if (userDetails.getTokenVersion() != tokenVersion) {

@@ -3,6 +3,7 @@ package org.example.springsecurity.handlers.impl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.example.springsecurity.configurations.caffeine.ICacheService;
 import org.example.springsecurity.configurations.jwt.JwtUtil;
 import org.example.springsecurity.configurations.security.UserInfo;
 import org.example.springsecurity.configurations.security.UserInfoServiceImpl;
@@ -10,7 +11,6 @@ import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.handlers.IAuthenticationHandler;
 import org.example.springsecurity.handlers.IRoleHandler;
 import org.example.springsecurity.models.GenerateTokenInfo;
-import org.example.springsecurity.models.TokenStorageInfo;
 import org.example.springsecurity.repositories.IAuthenticationMapper;
 import org.example.springsecurity.repositories.ITokenStorageMapper;
 import org.example.springsecurity.requests.ForgotPasswordReq;
@@ -33,6 +33,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -45,9 +46,13 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     @Value("${spring.security.refresh-token}")
     private String secretRefreshToken;
 
+    @Value("${spring.security.access-token}")
+    private String secretAccessToken;
+
     private final JwtUtil jwtUtil;
-    private final IAuthenticationMapper authMapper;
     private final IRoleHandler roleHandler;
+    private final ICacheService cacheService;
+    private final IAuthenticationMapper authMapper;
     private final ITokenStorageMapper tokenStorageMapper;
     private final UserInfoServiceImpl userDetailsService;
 
@@ -100,6 +105,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 //        }
 
         GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
+                .uuid(UUID.randomUUID().toString())
                 .username(userInfo.getUsername())
                 .version(userInfo.getTokenVersion())
                 .build();
@@ -125,6 +131,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         }
 
         GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
+                .uuid(UUID.randomUUID().toString())
                 .username(userDetails.getUsername())
                 .version(userDetails.getTokenVersion())
                 .build();
@@ -166,7 +173,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
                 .username(userInfo.getUsername())
 //                .email(userInfo.getEmail())
                 .build();
-        String generateToken = jwtUtil.generateToken(tokenInfo, 10 * 60);
+//        String generateToken = jwtUtil.generateToken(tokenInfo, 10 * 60);
 
 //        mailService.sendMailForgotPassword(generateToken, userInfo.getEmail());
         return new ForgotPasswordResp("Successfully forgot password");
@@ -181,8 +188,10 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
             SecurityContextHolder.clearContext();
         }
         String assetToken = jwtUtil.parseJwt(request);
-        if (assetToken != null) {
-            tokenStorageMapper.killToken(assetToken);
-        }
+        String jti = jwtUtil.extractJti(assetToken, secretAccessToken);
+        String tokenKey = "blacklist:" + jti.hashCode();
+        Date expiration = jwtUtil.extractExpiration(assetToken, secretAccessToken);
+        // Add token to blacklist
+        cacheService.putCache(jti, tokenKey, expiration.getTime());
     }
 }

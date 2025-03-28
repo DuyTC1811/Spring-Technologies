@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class GenerateTokenInfo {
+    private String uuid;
     private String username;
     private int version;
 }
