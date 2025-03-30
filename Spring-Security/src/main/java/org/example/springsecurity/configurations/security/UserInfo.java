@@ -3,11 +3,14 @@ package org.example.springsecurity.configurations.security;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -17,9 +20,16 @@ public class UserInfo implements UserDetails {
     private String password;
     private String status;
     private int tokenVersion;
-    private Set<GrantedAuthority> authorities;
+    private Set<GrantedAuthority> authorities = new HashSet<>();
 
     public UserInfo() {
+    }
+
+    public void setAuthorities(Set<String> roleCodes) {
+        this.authorities.addAll(roleCodes.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .collect(Collectors.toSet())
+        );
     }
 
     @Override

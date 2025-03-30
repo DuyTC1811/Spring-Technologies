@@ -32,7 +32,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "AUTHENTICATION & AUTHORIZATION", description = "API XÁC THỰC VÀ PHÂN QUYỀN")
+@Tag(name = "AUTHENTICATION", description = "API XÁC THỰC")
 @RequestMapping(path = "/api/auth")
 public class AuthenticationController {
     private final IAuthenticationHandler authentication;

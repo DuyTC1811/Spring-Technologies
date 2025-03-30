@@ -5,6 +5,7 @@ CREATE TABLE role_permissions
 (
     role_id    VARCHAR(36) NOT NULL,
     per_id     VARCHAR(36) NOT NULL,
+    enabled    BOOLEAN     NOT NULL DEFAULT TRUE,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_date TIMESTAMP   NULL,
     PRIMARY KEY (role_id, per_id),
@@ -15,5 +16,6 @@ CREATE TABLE role_permissions
 COMMENT ON TABLE role_permissions IS 'BẢNG LƯU TRỮ THÔNG TIN ID ROLE QUYỀN ';
 COMMENT ON COLUMN role_permissions.role_id IS 'ID ROLE';
 COMMENT ON COLUMN role_permissions.per_id IS 'ID QUYỀN';
+COMMENT ON COLUMN role_permissions.enabled IS 'TRẠNG THÁI QUYỀN: TRUE, FALSE';
 COMMENT ON COLUMN role_permissions.created_date IS 'NGÀY TẠO';
 COMMENT ON COLUMN role_permissions.updated_date IS 'NGÀY SỬA ĐỔI';

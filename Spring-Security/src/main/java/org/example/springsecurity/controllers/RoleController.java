@@ -1,6 +1,6 @@
 package org.example.springsecurity.controllers;
 
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/api/v1")
-@RequiredArgsConstructor
-public class CardsController {
-
+@Tag(name = "ROLES", description = "API ROLE")
+@RequestMapping("/api/roles")
+public class RoleController {
     @GetMapping("/user/card")
     public String getCards() {
         return "This Cards getCards Controller";
+
     }
 
     @DeleteMapping("/user/card")
