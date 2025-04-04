@@ -6,22 +6,18 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-public class ExceptionResponse {
-    @JsonFormat(
-            shape = JsonFormat.Shape.STRING,
-            pattern = "dd-MM-yyyy HH:MM:SS",
-            timezone = "Asia/Ho_Chi_Minh"
-    )
-    private LocalDateTime timestamp = LocalDateTime.now();
-    private Integer code;
-    private String detail;
-    private String description;
-
+public record ExceptionResponse(
+        @JsonFormat(
+                shape = JsonFormat.Shape.STRING,
+                pattern = "dd-MM-yyyy HH:mm:ss",
+                timezone = "Asia/Ho_Chi_Minh"
+        )
+        LocalDateTime timestamp,
+        Integer code,
+        String detail,
+        String description
+) {
     public ExceptionResponse(int code, String detail, String description) {
-        this.code = code;
-        this.detail = detail;
-        this.description = description;
+        this(LocalDateTime.now(), code, detail, description);
     }
 }
