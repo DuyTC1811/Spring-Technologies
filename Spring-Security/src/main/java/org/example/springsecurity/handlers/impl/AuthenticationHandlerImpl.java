@@ -215,6 +215,8 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         String assetToken = jwtUtil.parseJwt(request);
         String jti = jwtUtil.extractJti(assetToken, accessSecretToken);
         String tokenKey = "blacklist:" + jti.hashCode();
+
+        // Extract expiration date from the token
         Date expiration = jwtUtil.extractExpiration(assetToken, accessSecretToken);
         // Add token to blacklist
         cacheService.putCache(jti, tokenKey, expiration.getTime());

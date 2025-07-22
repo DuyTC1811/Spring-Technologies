@@ -95,6 +95,7 @@ public class JwtUtil {
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(generalSigningKey(secretKey))
+                .encryptWith(generalSigningKey(secretKey), Jwts.ENC.A256GCM)
                 .compact();
     }
 

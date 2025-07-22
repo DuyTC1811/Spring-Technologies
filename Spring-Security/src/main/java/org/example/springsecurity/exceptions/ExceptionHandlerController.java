@@ -14,6 +14,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.security.SignatureException;
 import java.util.LinkedHashMap;
@@ -69,7 +70,7 @@ public class ExceptionHandlerController {
             return handlerResponse(HttpStatus.FORBIDDEN.value(), exception.getMessage(), "Invalid compact JWT string");
         }
         exception.printStackTrace(System.err);
-        return handlerBaseResponse(HttpStatus.BAD_REQUEST.value(), "Unknown error", "An error occurred");
+        return handlerBaseResponse(HttpStatus.BAD_REQUEST.value(), "Unknown error", exception.getMessage());
     }
 
     private ResponseEntity<ValidExceptionResponse> handlerValidResponse(int code, String detail, Map<String, Object> description) {
