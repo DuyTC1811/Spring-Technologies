@@ -1,4 +1,4 @@
-package com.example.springexcel;
+package org.example.springexcel;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
