@@ -3,6 +3,7 @@ package org.example.ssestreaming.common;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,7 +16,7 @@ public class UploadService {
         this.statusStore = statusStore;
     }
 
-    public void processFileAsync(String uploadId) {
+    public void processFileAsync(String uploadId, MultipartFile files) {
 
         // Khởi tạo trạng thái ban đầu
         UploadStatus init = new UploadStatus();
