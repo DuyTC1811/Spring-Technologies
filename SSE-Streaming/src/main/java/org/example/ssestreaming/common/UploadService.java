@@ -1,21 +1,21 @@
 package org.example.ssestreaming.common;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Service
 public class UploadService {
     private final SseProgressStore statusStore;
-    private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     public UploadService(SseProgressStore statusStore) {
         this.statusStore = statusStore;
     }
 
+    @Async("virtualThread")
     public void processFileAsync(String uploadId, MultipartFile files) {
 
         // Khởi tạo trạng thái ban đầu
@@ -25,50 +25,58 @@ public class UploadService {
         init.setMessage("Waiting to start...");
         statusStore.save(init);
 
-        executor.submit(() -> {
-            UploadStatus status = statusStore.get(uploadId);
+        UploadStatus status = statusStore.get(uploadId);
 
-            try {
-                // 🔥 Delay lớn trước khi bắt đầu
-                Thread.sleep(1500);
+        long lastPushTime = 0;   // thời điểm đẩy SSE gần nhất (ms)
 
-                status.setState(UploadState.RUNNING);
-                status.setMessage("Processing file...");
-                statusStore.save(status);
+        try {
+            Thread.sleep(100);
 
-                // TODO đọc excel thật → lấy totalRows thật
-                int totalRows = 100;  // giả lập test
-                status.setTotalRows(totalRows);
-                statusStore.save(status);
+            status.setState(UploadState.RUNNING);
+            status.setMessage("Processing file...");
+            statusStore.save(status);
 
-                for (int i = 1; i <= totalRows; i++) {
+            // Lấy totalRows thật sau này
+            int totalRows = 100;
+            status.setTotalRows(totalRows);
+            statusStore.save(status);
 
-                    // 🔥 Delay từng dòng (chậm hơn để test)
-                    Thread.sleep(400);
+            lastPushTime = System.currentTimeMillis();
 
-                    status.setProcessedRows(i);
+            for (int i = 1; i <= totalRows; i++) {
 
-                    // kiểm tra OK / lỗi
-                    if (i % 10 == 0) {
-                        status.setFailedRows(status.getFailedRows() + 1);
-                        status.setMessage("Row " + i + " failed");
-                    } else {
-                        status.setSuccessRows(status.getSuccessRows() + 1);
-                        status.setMessage("Row " + i + " processed");
-                    }
+                Thread.sleep(400);
 
-                    statusStore.save(status);
+                status.setProcessedRows(i);
+
+                if (i % 10 == 0) {
+                    status.setFailedRows(status.getFailedRows() + 1);
+                    status.setMessage("Row " + i + " failed");
+                } else {
+                    status.setSuccessRows(status.getSuccessRows() + 1);
+                    status.setMessage("Row " + i + " processed");
                 }
 
-                status.setState(UploadState.SUCCESS);
-                status.setMessage("Upload completed!");
                 statusStore.save(status);
 
-            } catch (Exception ex) {
-                status.setState(UploadState.FAILED);
-                status.setMessage("Error: " + ex.getMessage());
-                statusStore.save(status);
+                // ⏱️ Chỉ gửi SSE mỗi 1 giây
+                long now = System.currentTimeMillis();
+                if (now - lastPushTime >= 1000) {
+                    statusStore.save(status);
+                    lastPushTime = now;
+                }
             }
-        });
+
+            // Gửi final update khi hoàn thành
+            status.setState(UploadState.SUCCESS);
+            status.setMessage("Upload completed!");
+            statusStore.save(status);
+
+        } catch (Exception ex) {
+            status.setState(UploadState.FAILED);
+            status.setMessage("Error: " + ex.getMessage());
+            statusStore.save(status);
+        }
     }
+
 }

@@ -68,36 +68,28 @@ public class DemoController {
     @GetMapping("/upload/stream")
     public SseEmitter streamUpload(@RequestParam("uploadId") String uploadId) {
         SseEmitter emitter = new SseEmitter(0L);
-
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-        executor.execute(() -> {
-            try {
-                int eventId = 0;
                 while (true) {
                     UploadStatus status = statusStore.get(uploadId);
                     if (status == null) {
                         emitter.complete();
-                        return;
                     }
 
                     emitter.send(
                             SseEmitter.event()
-                                    .id(String.valueOf(eventId++))
+                                    .id()
                                     .name("upload-progress")
                                     .data(status)
                     );
 
                     if (status.getState() == UploadState.SUCCESS || status.getState() == UploadState.FAILED) {
                         emitter.complete();
-                        return;
                     }
 
-                    Thread.sleep(30000); // 1 giây update 1 lần
+                    Thread.sleep(100); // 1 giây update 1 lần
                 }
             } catch (Exception ex) {
                 emitter.completeWithError(ex);
             }
-        });
 
         return emitter;
     }
