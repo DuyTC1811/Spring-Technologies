@@ -4,16 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.example.ssestreaming.common.SseProgressStore;
 import org.example.ssestreaming.common.UploadState;
 import org.example.ssestreaming.common.UploadStatus;
+import org.example.ssestreaming.utils.ParallelUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.StructuredTaskScope;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
 public class UploadStreamService {
+    private final ParallelUtils parallelUtils;
     private final SseProgressStore statusStore;
 
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
