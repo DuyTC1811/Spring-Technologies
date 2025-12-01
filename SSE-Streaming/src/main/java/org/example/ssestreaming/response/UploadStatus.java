@@ -1,4 +1,4 @@
-package org.example.ssestreaming.common;
+package org.example.ssestreaming.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

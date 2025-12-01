@@ -12,9 +12,7 @@ public class DemoAsyncService {
     public void doWorkAsync(String input) {
         long start = System.currentTimeMillis();
         Thread current = Thread.currentThread();
-        log.info("[ASYNC-START] threadName={}, isVirtual={}, input={} at {}",
-                current.getName(),
-                current.isVirtual(),
+        log.info("[ASYNC-START] threadName={}, isVirtual={}, input={} at {}", current.getName(), current.isVirtual(),
                 input,
                 start);
 

@@ -16,4 +16,8 @@ public class SseProgressStore {
     public void save(UploadStatus status) {
         store.put(status.getUploadId(), status);
     }
+
+    public void remove(String uploadId) {
+        store.remove(uploadId);
+    }
 }
