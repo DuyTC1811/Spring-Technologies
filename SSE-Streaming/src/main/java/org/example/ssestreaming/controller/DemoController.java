@@ -6,6 +6,7 @@ import org.example.ssestreaming.common.SseProgressStore;
 import org.example.ssestreaming.common.UploadStatus;
 import org.example.ssestreaming.service.IUploadService;
 import org.example.ssestreaming.service.SseEventService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +36,10 @@ public class DemoController {
     }
 
 
-    @GetMapping("/upload/stream")
+    @GetMapping(
+            value = "/upload/stream",
+            produces = MediaType.TEXT_EVENT_STREAM_VALUE // quan trọng!
+    )
     public SseEmitter stream(@RequestParam("streamId") String streamId) {
        return service.handleUploadProgress(streamId);
     }
