@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE Upload Progress</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #events {
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: #f8f8f8;
+            height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 13px;
+        }
+
+        #current {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        .progress-bar-wrapper {
+            width: 100%;
+            height: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: #4caf50;
+            transition: width 0.3s ease;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            color: #fff;
+            display: inline-block;
+        }
+
+        .status-INIT {
+            background: #607d8b;
+        }
+
+        .status-PROCESSING {
+            background: #2196f3;
+        }
+
+        .status-SUCCESS {
+            background: #4caf50;
+        }
+
+        .status-FAILED {
+            background: #f44336;
+        }
+
+        .status-EXTRACT_ERROR {
+            background: #ff9800;
+        }
+    </style>
+</head>
+
+<body>
+<h2>SSE Upload Progress Demo</h2>
+
+<label>Stream ID: </label>
+<input id="streamId" type="text" placeholder="Nhập streamId..." style="width: 300px" />
+<button onclick="startStream()">Start</button>
+
+<p><strong>Status:</strong> <span id="status">Chưa kết nối</span></p>
+
+<h3>Log sự kiện</h3>
+<div id="events"></div>
+
+<h3>Thông tin upload hiện tại</h3>
+<div id="current">
+    <div>
+        <span class="label">Upload ID:</span> <span id="curUploadId">-</span>
+    </div>
+    <div>
+        <span class="label">File:</span> <span id="curFileName">-</span>
+    </div>
+    <div>
+        <span class="label">Trạng thái:</span>
+        <span id="curStateBadge" class="status-badge status-INIT">INIT</span>
+    </div>
+    <div>
+        <span class="label">Tiến độ:</span>
+        <span id="curProgressText">0 / 0 (0%)</span>
+        <div class="progress-bar-wrapper">
+            <div id="curProgressBar" class="progress-bar"></div>
+        </div>
+    </div>
+    <div style="margin-top: 6px">
+        <span class="label">Message:</span>
+        <span id="curMessage">-</span>
+    </div>
+</div>
+
+<script>
+    let eventSource;
+
+    function startStream() {
+        const streamId = document.getElementById("streamId").value.trim();
+        if (!streamId) {
+            alert("Bạn phải nhập streamId!");
+            return;
+        }
+
+        // Đóng kết nối cũ nếu tồn tại
+        if (eventSource) {
+            eventSource.close();
+        }
+
+        const url = `http://localhost:8080/demo/upload/stream?streamId=${encodeURIComponent(
+            streamId
+        )}`;
+        eventSource = new EventSource(url);
+
+        const status = document.getElementById("status");
+        const eventsDiv = document.getElementById("events");
+
+        eventsDiv.textContent = ""; // clear log
+
+        eventSource.onopen = () => {
+            status.textContent = "Đã kết nối";
+        };
+
+        // Event mặc định (không name)
+        eventSource.onmessage = (event) => {
+            appendLog("[DEFAULT]", event.data);
+            renderDataToUI(event.data);
+        };
+
+        // Event có name = "upload-progress"
+        eventSource.addEventListener("progress", (event) => {
+            appendLog("[progress]", event.data);
+            renderDataToUI(event.data);
+        });
+
+        eventSource.onerror = (event) => {
+            status.textContent = "Lỗi hoặc mất kết nối";
+            eventSource.close();
+        };
+    }
+
+    function appendLog(prefix, data) {
+        const eventsDiv = document.getElementById("events");
+        eventsDiv.textContent += `${prefix} ${data}\n`;
+        eventsDiv.scrollTop = eventsDiv.scrollHeight;
+    }
+
+    // Hàm fill data lên UI chính
+    function renderDataToUI(raw) {
+        let json;
+        try {
+            json = JSON.parse(raw);
+        } catch (e) {
+            console.warn("Không parse được JSON:", raw);
+            return;
+        }
+
+        // JSON thật từ BE:
+        // { uploadId, processed, state, message }
+        const uploadId = json.uploadId || "-";
+        const processed = json.processed ?? 0;
+        const state = json.state || "INIT";
+        const message = json.message || "-";
+
+        // Không có total, nên coi processed là % luôn
+        const percent = processed > 100 ? 100 : processed;
+
+        document.getElementById("curUploadId").textContent = uploadId;
+        document.getElementById("curFileName").textContent = "(Không có từ BE)";
+        document.getElementById("curMessage").textContent = message;
+
+        // Badge trạng thái
+        const badge = document.getElementById("curStateBadge");
+        badge.textContent = state;
+        badge.className = "status-badge status-" + state;
+
+        // Text tiến độ
+        const progressText = document.getElementById("curProgressText");
+        progressText.textContent = percent + "%";
+
+        // Thanh progress bar
+        const bar = document.getElementById("curProgressBar");
+        bar.style.width = percent + "%";
+    }
+</script>
+</body>
+
+</html>
