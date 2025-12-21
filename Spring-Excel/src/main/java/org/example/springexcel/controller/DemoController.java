@@ -2,6 +2,7 @@ package org.example.springexcel.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springexcel.helper.FileExcelUtils;
+import org.example.springexcel.service.IUploadFileService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,15 +13,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@RequestMapping("/demo")
+import java.util.List;
+
+@RequestMapping("/demo/upload")
 @RestController
 @RequiredArgsConstructor
 public class DemoController {
     private final FileExcelUtils fileExcelUtils;
+    private final IUploadFileService uploadFileService;
 
     @PostMapping("/upload-file")
     public String uploadFile(@RequestParam("file") MultipartFile file) {
         return file.getOriginalFilename();
+    }
+
+    @PostMapping("/multi-file")
+    public String uploadData(@RequestParam("files") List<MultipartFile> files) {
+        uploadFileService.uploadFiles(files);
+        return "Number of files uploaded: " + files.size();
     }
 
     @GetMapping("/export")
