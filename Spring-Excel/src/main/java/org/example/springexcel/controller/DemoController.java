@@ -2,6 +2,7 @@ package org.example.springexcel.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springexcel.helper.FileExcelUtils;
+import org.example.springexcel.model.ResponseData;
 import org.example.springexcel.service.IUploadFileService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,8 +24,9 @@ public class DemoController {
     private final IUploadFileService uploadFileService;
 
     @PostMapping("/upload-file")
-    public String uploadFile(@RequestParam("file") MultipartFile file) {
-        return file.getOriginalFilename();
+    public ResponseEntity<List<ResponseData>> uploadFile(@RequestParam("file") MultipartFile file) {
+        List<ResponseData> singleFile = uploadFileService.readSingleFile(file);
+        return ResponseEntity.ok(singleFile);
     }
 
     @PostMapping("/multi-file")
