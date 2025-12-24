@@ -158,6 +158,15 @@ public class UploadFileServiceImpl implements IUploadFileService {
         }
     }
 
+    public static boolean matchRegex(String value, String regex) {
+        if (value == null) {
+            return false;
+        }
+        String v = value.strip();
+        return !v.isEmpty() && v.matches(regex);
+    }
+
+
     public static String readAccountNumber(Row row, int col, ResponseData data) {
         String value = row.getCellAsNumber(col)
                 .map(BigDecimal::toPlainString)
