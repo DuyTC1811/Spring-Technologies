@@ -35,6 +35,7 @@ package org.example.springexcel.service;//        long start = System.nanoTime()
 //        }
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -54,6 +55,9 @@ import java.util.List;
 @Slf4j
 @Service
 public class UploadFileServiceImpl implements IUploadFileService {
+    private static final int[] REQUIRED_COLS = {1, 2, 3, 4, 5, 6, 7, 8};
+    private static final String ACCOUNT_NO_REGEX = "^\\d{8,20}$";
+
     @Override
     public void uploadFiles(List<MultipartFile> files) {
         long start = System.nanoTime();
@@ -64,11 +68,11 @@ public class UploadFileServiceImpl implements IUploadFileService {
                     rows.skip(1).limit(10).forEach(row -> {
                         System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(1).orElse(""));
                         System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(2).orElse(""));
-                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(3).orElse(BigDecimal.ONE));
+                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(3).orElse(null));
                         System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(4).orElse(""));
                         System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(5).orElse(""));
                         System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(6).orElse(""));
-                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(7).orElse(BigDecimal.ONE));
+                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(7).orElse(null));
                         System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(8).orElse(""));
                     });
                 }
@@ -90,13 +94,19 @@ public class UploadFileServiceImpl implements IUploadFileService {
             Sheet sheet = workbook.getFirstSheet();
 
             try (var rows = sheet.openStream()) {
-                return rows.parallel()
+                List<ResponseData> result = rows
                         .skip(1)
-                        .takeWhile(row -> hasAnyValue(row, 1,2,3,4,5,6,7,8))
+                        .takeWhile(row -> hasAnyValue(row, REQUIRED_COLS))
                         .map(rowMapper::map)
                         .toList();
-            }
 
+                if (CollectionUtils.isEmpty(result)) {
+                    throw new RuntimeException("Excel file is empty or contains no data");
+                }
+                return result;
+            }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException("Read excel failed", e);
         }
@@ -107,11 +117,11 @@ public class UploadFileServiceImpl implements IUploadFileService {
         data.setRowNum(row.getRowNum());
         data.setCol1(readString(row, 1, data, "col1"));
         data.setCol2(readString(row, 2, data, "col2"));
-        data.setCol3(readBigDecimal(row, 3, data, "col3"));
+        data.setCol3(readNumber(row, 3, data, "col3"));
         data.setCol4(readString(row, 4, data, "col4"));
         data.setCol5(readString(row, 5, data, "col5"));
         data.setCol6(readString(row, 6, data, "col6"));
-        data.setCol7(readBigNumOrString(row, 7, data, "col7"));
+        data.setCol7(readAccountNumber(row, 7, data));
         data.setCol8(readString(row, 8, data, "col8"));
         return data;
     };
@@ -137,7 +147,7 @@ public class UploadFileServiceImpl implements IUploadFileService {
         }
     }
 
-    public static BigDecimal readBigDecimal(Row row, int col, ResponseData data, String colName) {
+    public static BigDecimal readNumber(Row row, int col, ResponseData data, String colName) {
         try {
             return row.getCellAsNumber(col).orElse(null);
         } catch (Exception e) {
@@ -148,16 +158,24 @@ public class UploadFileServiceImpl implements IUploadFileService {
         }
     }
 
-    public static String readBigNumOrString(Row row, int col, ResponseData data, String colName) {
-        try {
-            return row.getCellAsString(col).orElse("");
-        } catch (Exception e) {
-            String raw = String.valueOf(row.getCellAsNumber(col).orElse(null));
-            data.setCol7(raw);
+    public static String readAccountNumber(Row row, int col, ResponseData data) {
+        String value = row.getCellAsNumber(col)
+                .map(BigDecimal::toPlainString)
+                .orElseGet(() -> row.getCellAsString(col)
+                        .map(String::strip)
+                        .orElse("")
+                );
 
-            data.getErrors().add(new ErrorMess(row.getRowNum(), colName, "Invalid number format, value='" + raw + "'"));
-            return null;
+        if (value.isEmpty()) {
+            data.getErrors().add(new ErrorMess(row.getRowNum() ," 7 ", "Account number is empty"));
+            return value;
         }
+
+        // Validate format số tài khoản
+        if (!value.matches(ACCOUNT_NO_REGEX)) {
+            data.getErrors().add(new ErrorMess(row.getRowNum(), " 7 " ,"Invalid account number format: " + value));
+        }
+        return value;
     }
 
 
