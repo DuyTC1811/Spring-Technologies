@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: QuartzScheduler
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: anhduy12
+    hikari:
+      auto-commit: true
+      minimum-idle: 2            # Số lượng kết nối nhàn rỗi tối thiểu
+      maximum-pool-size: 10      # Số lượng kết nối tối đa
+      idle-timeout: 600000       # Thời gian chờ nhàn rỗi (10 phút)
+      max-lifetime: 1800000      # Thời gian sống tối đa của kết nối (30 phút)
+      connection-timeout: 20000  # Thời gian chờ kết nối (20 giây)
+      pool-name: '[ HIKARI ] ::'
+  quartz:
+    job-store-type: jdbc # Sử dụng JDBC Job Store
+    jdbc:
+      initialize-schema: never  # Không khởi tạo schema tự động
+    properties:
+      org.quartz:
+        scheduler:
+          instanceName: QuartzScheduler
+          instanceId: AUTO
+          skipUpdateCheck: true
+          idleWaitTime: 30000
+        threadPool:
+          class: org.quartz.simpl.SimpleThreadPool
+          threadCount: 10
+          threadPriority: 5
+          makeThreadsDaemons: true
+        jobStore:
+          driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+          useProperties: false
+          isClustered: true
+          clusterCheckinInterval: 15000
+          acquireTriggersWithinLock: true
+          tablePrefix: QRTZ_
