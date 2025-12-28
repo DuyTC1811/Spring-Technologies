@@ -4,7 +4,6 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PreDestroy;
 import org.example.springquartz.enums.ScheduleType;
 import org.example.springquartz.model.JobInfo;
-import org.example.springquartz.model.TimerInfo;
 import org.example.springquartz.request.ScheduleCreateRequest;
 import org.example.springquartz.request.ScheduleUpsertRequest;
 import org.quartz.CronScheduleBuilder;
@@ -17,14 +16,11 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -53,24 +49,22 @@ public class SchedulerService implements IQuartzScheduleService {
                 throw new IllegalStateException("Trigger already exists: " + triggerKey);
             }
 
-            // 2) create JobDetail
+            //  CREATE JOB DETAIL
             JobDetail jobDetail = newJob(JobInfo.class)
                     .withIdentity(jobKey)
                     .usingJobData(toJobDataMap(req.jobData()))
-                    .storeDurably(true)
                     .build();
 
-            scheduler.addJob(jobDetail, false);
-
-            // 3) create Trigger + schedule
-            Trigger trigger = buildTrigger(req.scheduleType(),
+            // CREATE TRIGGER + SCHEDULE
+            Trigger trigger = buildTrigger(
+                    req.scheduleType(),
                     req.cronExpression(),
                     jobKey,
                     req.repeatIntervalMs(),
                     req.repeatCount(),
                     triggerKey
             );
-            scheduler.scheduleJob(trigger);
+            scheduler.scheduleJob(jobDetail, trigger);
 
         } catch (SchedulerException e) {
             LOGGER.error("[ ERROR ] :: Failed to schedule job: [{}]", e.getMessage());
@@ -80,46 +74,64 @@ public class SchedulerService implements IQuartzScheduleService {
 
     @Override
     public void updateSchedule(String triggerName, String triggerGroup, ScheduleUpsertRequest req) {
-        JobKey jobKey = JobKey.jobKey(req.jobName(), req.jobGroup());
         TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroup);
 
         try {
-            // 1) validate: phải tồn tại để update
-            if (!scheduler.checkExists(jobKey)) {
-                LOGGER.warn("JOB NOT FOUND: {}", jobKey);
-                throw new IllegalStateException("Job not found: " + jobKey);
-            }
-            if (!scheduler.checkExists(triggerKey)) {
+            Trigger oldTrigger = scheduler.getTrigger(triggerKey);
+            if (oldTrigger == null) {
                 LOGGER.warn("TRIGGER NOT FOUND: {}", triggerKey);
                 throw new IllegalStateException("Trigger not found: " + triggerKey);
             }
 
-            // 2) (optional) update JobDataMap nếu client gửi lên
-            if (req.jobData() != null && !req.jobData().isEmpty()) {
-                JobDetail existing = scheduler.getJobDetail(jobKey);
-                JobDataMap merged = new JobDataMap(existing.getJobDataMap());
-                merged.putAll(req.jobData());
+            // ✅ jobKey thật từ trigger đang tồn tại
+            JobKey jobKey = oldTrigger.getJobKey();
 
-                JobDetail updatedJob = existing.getJobBuilder()
-                        .usingJobData(merged)
-                        .storeDurably(true)
-                        .build();
-
-                scheduler.addJob(updatedJob, true); // replace=true
+            // optional: nếu bạn muốn validate req.jobName/jobGroup phải khớp:
+            if (req.jobName() != null && req.jobGroup() != null) {
+                JobKey reqJobKey = JobKey.jobKey(req.jobName(), req.jobGroup());
+                if (!reqJobKey.equals(jobKey)) {
+                    LOGGER.error("Request jobKey does not match existing trigger's jobKey. req={}, existing={}", reqJobKey, jobKey);
+                    throw new IllegalArgumentException(
+                            "Request jobKey does not match existing trigger's jobKey. req=" + reqJobKey + ", existing=" + jobKey
+                    );
+                }
             }
 
-            // 3) build trigger mới và reschedule
-            Trigger newTrigger = buildTrigger(req.scheduleType(),
+            if (!scheduler.checkExists(jobKey)) {
+                LOGGER.warn("JOB NOT FOUND for triggerKey={}, jobKey={}", triggerKey, jobKey);
+                throw new IllegalStateException("Job not found: " + jobKey);
+            }
+
+            // (optional) update jobDataMap nếu gửi lên
+            if (req.jobData() != null && !req.jobData().isEmpty()) {
+                JobDetail existing = scheduler.getJobDetail(jobKey);
+                if (existing != null) {
+                    JobDataMap merged = new JobDataMap(existing.getJobDataMap());
+                    merged.putAll(req.jobData());
+
+                    JobDetail updatedJob = existing.getJobBuilder()
+                            .usingJobData(merged)
+                            .build();
+
+                    scheduler.addJob(updatedJob, true); // replace=true
+                }
+            }
+
+            // ✅ build trigger mới với CÙNG triggerKey
+            Trigger newTrigger = buildTrigger(
+                    req.scheduleType(),
                     req.cronExpression(),
                     jobKey,
                     req.repeatIntervalMs(),
                     req.repeatCount(),
                     triggerKey
             );
+
             scheduler.rescheduleJob(triggerKey, newTrigger);
 
         } catch (SchedulerException e) {
-            LOGGER.error("[ ERROR ] :: Failed to update schedule: [{}]", e.getMessage());
+            LOGGER.error("[ERROR] Failed to update schedule. triggerKey={}, msg={}",
+                    triggerKey, e.getMessage(), e);
             throw new RuntimeException("Failed to update schedule", e);
         }
     }
@@ -149,17 +161,6 @@ public class SchedulerService implements IQuartzScheduleService {
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    @Override
-    public List<TimerInfo> getAllRunningTimers() {
-        try {
-            Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyGroup());
-        } catch (SchedulerException e) {
-            throw new RuntimeException(e);
-        }
-        return List.of();
     }
 
     @Override

@@ -26,10 +26,6 @@ spring:
           skipUpdateCheck: true
           idleWaitTime: 30000
         threadPool:
-          class: org.quartz.simpl.SimpleThreadPool
-          threadCount: 10
-          threadPriority: 5
-          makeThreadsDaemons: true
         jobStore:
           driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
           useProperties: false

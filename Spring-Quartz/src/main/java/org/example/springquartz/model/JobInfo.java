@@ -13,7 +13,8 @@ public class JobInfo implements Job {
     @Override
     public void execute(JobExecutionContext context) {
         JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
-        Object object = jobDataMap.get(JobInfo.class.getSimpleName());
-        LOGGER.info("Remaining fire count is '{}'", object);
+        LOGGER.info("JOB DATA MAP: {}", jobDataMap);
+        Object object = jobDataMap.get("message");
+        LOGGER.info("REMAINING FIRE COUNT IS '{}'", object);
     }
 }

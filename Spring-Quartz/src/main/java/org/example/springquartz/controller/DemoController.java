@@ -41,19 +41,19 @@ public class DemoController {
 
     // Command endpoints (giữ như bạn)
     @PostMapping("/triggers/{group}/{name}/pause")
-    public ResponseEntity<?> pause(@PathVariable String group, @PathVariable String name){
+    public ResponseEntity<?> pause(@PathVariable String group, @PathVariable String name) {
         service.pause(name, group);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/triggers/{group}/{name}/resume")
-    public ResponseEntity<?> resume(@PathVariable String group, @PathVariable String name){
+    public ResponseEntity<?> resume(@PathVariable String group, @PathVariable String name) {
         service.resume(name, group);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/jobs/{group}/{name}")
-    public ResponseEntity<?> deleteJob(@PathVariable String group, @PathVariable String name){
+    public ResponseEntity<?> deleteJob(@PathVariable String group, @PathVariable String name) {
         service.deleteJob(name, group);
         return ResponseEntity.noContent().build();
     }
