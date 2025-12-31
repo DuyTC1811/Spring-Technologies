@@ -4,9 +4,11 @@ import org.example.springquartz.request.ScheduleCreateRequest;
 import org.example.springquartz.request.ScheduleUpsertRequest;
 
 public interface IQuartzScheduleService {
-    void schedule(ScheduleCreateRequest req);
+    void cronSchedule(ScheduleCreateRequest req);
 
-    void updateSchedule(String triggerName, String triggerGroup, ScheduleUpsertRequest req);
+    void simpleSchedule(ScheduleCreateRequest req);
+
+    void updateCronSchedule(String triggerName, String triggerGroup, ScheduleUpsertRequest req);
 
     void pause(String triggerName, String triggerGroup);
 

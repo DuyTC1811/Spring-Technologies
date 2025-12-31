@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.example.springquartz.enums.ScheduleType.CRON;
+import static org.example.springquartz.enums.ScheduleType.SIMPLE;
+
 @RestController
 @RequestMapping("/demo")
 public class DemoController {
@@ -24,8 +27,15 @@ public class DemoController {
     // CREATE
     @PostMapping("/schedules")
     public ResponseEntity<?> create(@RequestBody ScheduleCreateRequest req) {
-        service.schedule(req); // chỉ tạo mới, tồn tại thì 409
-        return ResponseEntity.status(201).build();
+        if (CRON.equals(req.scheduleType())) {
+            service.cronSchedule(req); // chỉ tạo mới, tồn tại thì 409
+            return ResponseEntity.status(201).build();
+        }
+        if (SIMPLE.equals(req.scheduleType())) {
+            service.simpleSchedule(req); // chỉ tạo mới, tồn tại thì 409
+            return ResponseEntity.status(201).build();
+        }
+        return ResponseEntity.status(400).build();
     }
 
     // UPDATE (full replace)
@@ -35,7 +45,7 @@ public class DemoController {
             @PathVariable String triggerName,
             @RequestBody ScheduleUpsertRequest req
     ) {
-        service.updateSchedule(triggerGroup, triggerName, req);
+        service.updateCronSchedule(triggerGroup, triggerName, req);
         return ResponseEntity.ok().build();
     }
 

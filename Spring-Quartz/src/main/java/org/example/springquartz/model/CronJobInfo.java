@@ -7,14 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import static org.example.springquartz.utils.ConvertUtils.objectToJson;
+
 @Component
-public class JobInfo implements Job {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobInfo.class);
+public class CronJobInfo implements Job {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CronJobInfo.class);
+
     @Override
     public void execute(JobExecutionContext context) {
         JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
-        LOGGER.info("JOB DATA MAP: {}", jobDataMap);
-        Object object = jobDataMap.get("message");
-        LOGGER.info("REMAINING FIRE COUNT IS '{}'", object);
+        LOGGER.info("[CRON-JOB-INFO] DATA MAP: {}", objectToJson(jobDataMap));
     }
 }

@@ -2,8 +2,7 @@ package org.example.springquartz.service;
 
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PreDestroy;
-import org.example.springquartz.enums.ScheduleType;
-import org.example.springquartz.model.JobInfo;
+import org.example.springquartz.model.CronJobInfo;
 import org.example.springquartz.request.ScheduleCreateRequest;
 import org.example.springquartz.request.ScheduleUpsertRequest;
 import org.quartz.CronScheduleBuilder;
@@ -35,45 +34,69 @@ public class SchedulerService implements IQuartzScheduleService {
     }
 
     @Override
-    public void schedule(ScheduleCreateRequest req) {
+    public void cronSchedule(ScheduleCreateRequest req) {
         JobKey jobKey = JobKey.jobKey(req.jobName(), req.jobGroup());
         TriggerKey triggerKey = TriggerKey.triggerKey(req.triggerName(), req.triggerGroup());
 
         try {
             if (scheduler.checkExists(jobKey)) {
-                LOGGER.warn("JOB ALREADY EXISTS: {}", jobKey);
+                LOGGER.warn("CRON JOB ALREADY EXISTS: {}", jobKey);
                 throw new IllegalStateException("Job already exists: " + jobKey);
             }
             if (scheduler.checkExists(triggerKey)) {
-                LOGGER.warn("TRIGGER ALREADY EXISTS: {}", triggerKey);
+                LOGGER.warn("CRON TRIGGER ALREADY EXISTS: {}", triggerKey);
                 throw new IllegalStateException("Trigger already exists: " + triggerKey);
             }
 
             //  CREATE JOB DETAIL
-            JobDetail jobDetail = newJob(JobInfo.class)
+            JobDetail jobDetail = newJob(CronJobInfo.class)
                     .withIdentity(jobKey)
                     .usingJobData(toJobDataMap(req.jobData()))
                     .build();
 
             // CREATE TRIGGER + SCHEDULE
-            Trigger trigger = buildTrigger(
-                    req.scheduleType(),
-                    req.cronExpression(),
-                    jobKey,
-                    req.repeatIntervalMs(),
-                    req.repeatCount(),
-                    triggerKey
-            );
+            Trigger trigger = buildTrigger(req.cronExpression(), jobKey, triggerKey);
             scheduler.scheduleJob(jobDetail, trigger);
 
         } catch (SchedulerException e) {
-            LOGGER.error("[ ERROR ] :: Failed to schedule job: [{}]", e.getMessage());
-            throw new RuntimeException("Failed to add schedule", e);
+            LOGGER.error("[ ERROR ] :: Failed to scheduleCron job: [{}]", e.getMessage());
+            throw new RuntimeException("Failed to add scheduleCron", e);
         }
     }
 
     @Override
-    public void updateSchedule(String triggerName, String triggerGroup, ScheduleUpsertRequest req) {
+    public void simpleSchedule(ScheduleCreateRequest req) {
+        JobKey jobKey = JobKey.jobKey(req.jobName(), req.jobGroup());
+        TriggerKey triggerKey = TriggerKey.triggerKey(req.triggerName(), req.triggerGroup());
+
+        try {
+            if (scheduler.checkExists(jobKey)) {
+                LOGGER.warn("SIMPLE JOB ALREADY EXISTS: {}", jobKey);
+                throw new IllegalStateException("Job already exists: " + jobKey);
+            }
+            if (scheduler.checkExists(triggerKey)) {
+                LOGGER.warn("SIMPLE TRIGGER ALREADY EXISTS: {}", triggerKey);
+                throw new IllegalStateException("Trigger already exists: " + triggerKey);
+            }
+
+            //  CREATE JOB DETAIL
+            JobDetail jobDetail = newJob(CronJobInfo.class)
+                    .withIdentity(jobKey)
+                    .usingJobData(toJobDataMap(req.jobData()))
+                    .build();
+
+            // CREATE TRIGGER + SCHEDULE
+            Trigger trigger = buildTrigger(jobKey, req.repeatIntervalMs(), req.repeatCount(), triggerKey);
+            scheduler.scheduleJob(jobDetail, trigger);
+
+        } catch (SchedulerException e) {
+            LOGGER.error("[ ERROR ] :: Failed to SIMPLE JOB  job: [{}]", e.getMessage());
+            throw new RuntimeException("Failed to add SIMPLE JOB ", e);
+        }
+    }
+
+    @Override
+    public void updateCronSchedule(String triggerName, String triggerGroup, ScheduleUpsertRequest req) {
         TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroup);
 
         try {
@@ -90,9 +113,9 @@ public class SchedulerService implements IQuartzScheduleService {
             if (req.jobName() != null && req.jobGroup() != null) {
                 JobKey reqJobKey = JobKey.jobKey(req.jobName(), req.jobGroup());
                 if (!reqJobKey.equals(jobKey)) {
-                    LOGGER.error("Request jobKey does not match existing trigger's jobKey. req={}, existing={}", reqJobKey, jobKey);
+                    LOGGER.error("Request jobKey does not match existing trigger's jobKey. req [{}], existing [{}]", reqJobKey, jobKey);
                     throw new IllegalArgumentException(
-                            "Request jobKey does not match existing trigger's jobKey. req=" + reqJobKey + ", existing=" + jobKey
+                            "Request jobKey does not match existing trigger's jobKey. req " + reqJobKey + ", existing=" + jobKey
                     );
                 }
             }
@@ -118,21 +141,14 @@ public class SchedulerService implements IQuartzScheduleService {
             }
 
             // ✅ build trigger mới với CÙNG triggerKey
-            Trigger newTrigger = buildTrigger(
-                    req.scheduleType(),
-                    req.cronExpression(),
-                    jobKey,
-                    req.repeatIntervalMs(),
-                    req.repeatCount(),
-                    triggerKey
-            );
+            Trigger newTrigger = buildTrigger(req.cronExpression(), jobKey, triggerKey);
 
             scheduler.rescheduleJob(triggerKey, newTrigger);
 
         } catch (SchedulerException e) {
-            LOGGER.error("[ERROR] Failed to update schedule. triggerKey={}, msg={}",
+            LOGGER.error("[ERROR] Failed to update scheduleCron. triggerKey={}, msg={}",
                     triggerKey, e.getMessage(), e);
-            throw new RuntimeException("Failed to update schedule", e);
+            throw new RuntimeException("Failed to update scheduleCron", e);
         }
     }
 
@@ -173,43 +189,28 @@ public class SchedulerService implements IQuartzScheduleService {
         }
     }
 
-    private Trigger buildTrigger(
-            ScheduleType type,
-            String cronExpression,
-            JobKey jobKey,
-            Long repeatIntervalMs,
-            Integer repeatCount,
-            TriggerKey triggerKey) {
+    private Trigger buildTrigger(String cronExpression, JobKey jobKey, TriggerKey triggerKey) {
+        TriggerBuilder<Trigger> triggerBuilder = newTrigger().withIdentity(triggerKey).forJob(jobKey);
+        if (StringUtils.isBlank(cronExpression)) {
+            throw new IllegalArgumentException("cronExpression is required for CRON scheduleCron");
+        }
+        return triggerBuilder.withSchedule(
+                        CronScheduleBuilder.cronSchedule(cronExpression))
+                .build();
+    }
 
-        TriggerBuilder<Trigger> tb = newTrigger()
-                .withIdentity(triggerKey)
-                .forJob(jobKey);
-
-        return switch (type) {
-            case CRON -> {
-                if (StringUtils.isBlank(cronExpression)) {
-                    throw new IllegalArgumentException("cronExpression is required for CRON schedule");
-                }
-                yield tb.withSchedule(CronScheduleBuilder
-                                .cronSchedule(cronExpression))
-                        .build();
-            }
-            case SIMPLE -> {
-                if (repeatIntervalMs == null || repeatIntervalMs <= 0) {
-                    throw new IllegalArgumentException("repeatIntervalMs must be > 0 for SIMPLE schedule");
-                }
-                SimpleScheduleBuilder ssb = SimpleScheduleBuilder
-                        .simpleSchedule()
-                        .withIntervalInMilliseconds(repeatIntervalMs);
-                if (repeatCount == null) {
-                    ssb = ssb.repeatForever();
-                } else {
-                    ssb = ssb.withRepeatCount(repeatCount);
-                }
-
-                yield tb.withSchedule(ssb).build();
-            }
-        };
+    private Trigger buildTrigger(JobKey jobKey, Long repeatIntervalMs, Integer repeatCount, TriggerKey triggerKey) {
+        TriggerBuilder<Trigger> tb = newTrigger().withIdentity(triggerKey).forJob(jobKey);
+        if (repeatIntervalMs == null || repeatIntervalMs <= 0) {
+            throw new IllegalArgumentException("repeatIntervalMs must be > 0 for SIMPLE scheduleCron");
+        }
+        SimpleScheduleBuilder ssb = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(repeatIntervalMs);
+        if (repeatCount == null) {
+            ssb = ssb.repeatForever();
+        } else {
+            ssb = ssb.withRepeatCount(repeatCount);
+        }
+        return tb.withSchedule(ssb).build();
     }
 
     private JobDataMap toJobDataMap(Map<String, Object> jobData) {
