@@ -1,39 +1,4 @@
-package org.example.springexcel.service;//        long start = System.nanoTime();
-//        for (MultipartFile file : files) {
-//            try (var inputStream = file.getInputStream(); var workbook = new ReadableWorkbook(inputStream)) {
-//                Sheet sheet = workbook.getFirstSheet();
-//                try (var rows = sheet.openStream()) {
-//                    rows.skip(1).forEach(row -> {
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsDate(0).orElse(null));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(1).orElse(""));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(2).orElse(""));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(3).orElse(BigDecimal.ONE));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(4).orElse(BigDecimal.ONE));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(5).orElse(""));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(6).orElse(""));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(7).orElse(BigDecimal.ONE));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(8).orElse(""));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(9).orElse(BigDecimal.ONE));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(10).orElse(""));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(11).orElse(""));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(12).orElse(BigDecimal.ONE));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(13).orElse(""));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(14).orElse(""));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsNumber(15).orElse(BigDecimal.ONE));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsDate(16).orElse(null));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsDate(17).orElse(null));
-//                        System.out.println("Row " + row.getRowNum() + ": " + row.getCellAsString(18).orElse(""));
-//                    });
-//                }
-//                long end = System.nanoTime();
-//                long elapsedNs = end - start;
-//                System.out.println("⏱ Read + validate time = " + (elapsedNs / 1_000_000) + " ms");
-//            } catch (Exception e) {
-//                System.err.println("Error processing file: " + file.getOriginalFilename());
-//                e.printStackTrace(System.err);
-//            }
-//        }
-
+package org.example.springexcel.service;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;
