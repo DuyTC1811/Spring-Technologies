@@ -3,6 +3,7 @@ package org.example.springsecurity.configurations.security;
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.repositories.IAuthenticationMapper;
 import org.example.springsecurity.repositories.IRoleMapper;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 @Service
+@NullMarked
 @RequiredArgsConstructor
 public class UserInfoServiceImpl implements UserDetailsService {
     private final IAuthenticationMapper authMapper;
