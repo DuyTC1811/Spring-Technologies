@@ -25,7 +25,6 @@ public class Main {
                 }""";
 
         // ---- Client encrypts + signs ----
-        Object ClientCrypto;
         Map<String, String> req = encryptAndSign(
                 payload,
                 bank.getPublic(),         // Ngân hàng public key
