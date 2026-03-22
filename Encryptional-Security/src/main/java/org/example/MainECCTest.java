@@ -3,11 +3,12 @@ package org.example;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import static org.example.helper.ECCKeyUtils.loadCertificateFromPem;
-import static org.example.helper.ECCKeyUtils.loadPrivateKeyECCFromPem;
-import static org.example.helper.RSAKeyUtils.loadResourceAsString;
-import static org.example.helper.RSAKeyUtils.signECDSA;
-import static org.example.helper.RSAKeyUtils.verifyECDSA;
+import static org.example.helper.HelperKeyUtils.EC;
+import static org.example.helper.HelperKeyUtils.loadCertificateFromPem;
+import static org.example.helper.HelperKeyUtils.loadPrivateKeyFromPem;
+import static org.example.helper.HelperKeyUtils.loadResourceAsString;
+import static org.example.helper.HelperKeyUtils.signature;
+import static org.example.helper.HelperKeyUtils.verify;
 
 
 public class MainECCTest {
@@ -24,7 +25,7 @@ public class MainECCTest {
         // String publicPem = loadResourceAsString("keys/EC/public.pem");
 
         // LOAD KEY
-        PrivateKey privateKey = loadPrivateKeyECCFromPem(privatePem);
+        PrivateKey privateKey = loadPrivateKeyFromPem(privatePem, EC);
 
         // Cách 1: lấy từ cert
         PublicKey publicKey = loadCertificateFromPem(certPem).getPublicKey();
@@ -33,11 +34,11 @@ public class MainECCTest {
         String data = "amount=1000&account=123456";
 
         // SIGN
-        String signature = signECDSA(data, privateKey);
+        String signature = signature(data, privateKey);
         System.out.println("[ SIGNATURE ] ::: " + signature);
 
         // VERIFY
-        boolean valid = verifyECDSA(data, signature, publicKey);
+        boolean valid = verify(data, signature, publicKey);
         System.out.println("[ VERIFY ]: " + valid);
     }
 }

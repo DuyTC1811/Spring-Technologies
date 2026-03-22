@@ -3,11 +3,14 @@ package org.example;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import static org.example.helper.RSAKeyUtils.loadCertificateFromPem;
-import static org.example.helper.RSAKeyUtils.loadPrivateKeyFromPem;
-import static org.example.helper.RSAKeyUtils.loadResourceAsString;
-import static org.example.helper.RSAKeyUtils.sign;
-import static org.example.helper.RSAKeyUtils.verify;
+import static org.example.helper.HelperKeyUtils.EC;
+import static org.example.helper.HelperKeyUtils.RSA;
+import static org.example.helper.HelperKeyUtils.loadCertificateFromPem;
+import static org.example.helper.HelperKeyUtils.loadPrivateKeyFromPem;
+import static org.example.helper.HelperKeyUtils.loadResourceAsString;
+import static org.example.helper.HelperKeyUtils.signature;
+import static org.example.helper.HelperKeyUtils.verify;
+
 
 public class MainRSATest {
     public static void main(String[] args) {
@@ -20,12 +23,12 @@ public class MainRSATest {
         // hoặc dùng public.pem:
         // String publicPem = loadResourceAsString("keys/public.pem");
 
-        PrivateKey privateKey = loadPrivateKeyFromPem(privatePem);
+        PrivateKey privateKey = loadPrivateKeyFromPem(privatePem, RSA);
         PublicKey publicKey = loadCertificateFromPem(certPem).getPublicKey();
 
         String data = "amount=1000&account=123456";
 
-        String signature = sign(data, privateKey);
+        String signature = signature(data, privateKey);
         System.out.println("[ SIGNATURE ] ::: " + signature);
 
         boolean valid = verify(data, signature, publicKey);
