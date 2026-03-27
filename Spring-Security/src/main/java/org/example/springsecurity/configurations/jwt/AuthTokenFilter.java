@@ -8,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.example.springsecurity.configurations.caffeine.ICacheService;
 import org.example.springsecurity.configurations.security.UserInfoServiceImpl;
 import org.example.springsecurity.exceptions.BaseException;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-
 @Component
+@NullMarked
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
     @Value("${spring.security.access-token}")
@@ -33,9 +33,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) {
         var jwtToken = jwtUtil.parseJwt(request);
         try {
             if (jwtToken == null) {

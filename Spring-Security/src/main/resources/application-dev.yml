@@ -57,7 +57,7 @@ mybatis:
     map-underscore-to-camel-case: true
   type-aliases-package: org.example.springsecurity.requests, org.example.springsecurity.responses
   type-handlers-package: org.example.springsecurity.util
-  mapper-locations: /mybatis/*.xml
+  mapper-locations: classpath:/mybatis/*.xml
 
 cors:
   allowed:

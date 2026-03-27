@@ -2,6 +2,7 @@ package org.example.springsecurity.configurations.security;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NullMarked
 public class UserInfo implements UserDetails {
     private String userId;
     private String username;

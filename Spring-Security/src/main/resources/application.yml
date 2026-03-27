@@ -17,6 +17,7 @@ spring:
       pool-name: '[ CONNECT ] ===>'
 
   liquibase:
+    enabled: true
     change-log: classpath:liquibase/main-changelog.yml
     clear-checksums: true
 
@@ -58,7 +59,7 @@ mybatis:
     map-underscore-to-camel-case: true
   type-aliases-package: org.example.springsecurity.requests, org.example.springsecurity.responses
   type-handlers-package: org.example.springsecurity.util
-  mapper-locations: /mybatis/*.xml
+  mapper-locations: classpath:/mybatis/*.xml
 
 cors:
   allowed:
@@ -72,4 +73,3 @@ cors:
       /swagger-resources/**,
       /webjars/**,
       /api/auth/**,
-

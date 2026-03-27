@@ -3,6 +3,7 @@ package org.example.springsecurity.configurations.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Component
+@NullMarked
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
