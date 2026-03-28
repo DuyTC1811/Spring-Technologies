@@ -28,6 +28,12 @@ dependencies {
     compileOnly ("org.projectlombok:lombok")
     annotationProcessor ("org.projectlombok:lombok")
 
+    // Libraries ZXing
+    implementation("com.google.zxing:core:3.5.4")
+    implementation("com.google.zxing:javase:3.5.4")
+
+    implementation("commons-codec:commons-codec:1.21.0")
+
     runtimeOnly ("org.postgresql:postgresql")
     testImplementation ("org.springframework.boot:spring-boot-starter-test")
     implementation ("org.liquibase:liquibase-core")

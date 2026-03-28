@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS users
     email             VARCHAR(50)  NOT NULL UNIQUE,
     registration      VARCHAR(15)  NOT NULL,
     password          VARCHAR(255) NOT NULL,
+    twofa_secret      VARCHAR(20)  NULL,
+    twofa_enabled     BOOLEAN      NOT NULL DEFAULT FALSE,
     created_date      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_date      TIMESTAMP    NULL
 );
