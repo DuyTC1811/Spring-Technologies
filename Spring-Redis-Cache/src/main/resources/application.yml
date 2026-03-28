@@ -1,8 +1,22 @@
 spring:
-  redis:
-    host: localhost
-    port: 6379
-#    username: redis
-    password: duytc
-    connect-timeout: 60000
-    database: 0
+  data:
+    redis:
+      timeout: 3000ms
+
+      cluster:
+        nodes:
+          - 127.0.0.1:7001
+          - 127.0.0.1:7002
+          - 127.0.0.1:7003
+          - 127.0.0.1:7004
+          - 127.0.0.1:7005
+          - 127.0.0.1:7006
+        max-redirects: 5
+
+      lettuce:
+        pool:
+          max-active: 32
+          max-idle: 16
+          min-idle: 4
+          max-wait: 3000ms
+        shutdown-timeout: 100ms

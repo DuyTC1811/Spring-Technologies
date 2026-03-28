@@ -26,12 +26,15 @@ repositories {
 
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    // implementation 'redis.clients:jedis:5.1.5'
+    implementation("redis.clients:jedis:7.4.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.21.2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2")
     //implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 //    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.7.5'
 }

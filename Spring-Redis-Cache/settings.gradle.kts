@@ -1,1 +1,1 @@
-rootProject.name = 'Spring-Redis-Cache'
+rootProject.name = "Spring-Redis-Cache"

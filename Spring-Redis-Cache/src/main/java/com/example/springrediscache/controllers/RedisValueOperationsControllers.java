@@ -17,25 +17,26 @@ public class RedisValueOperationsControllers {
 
     @PostMapping("/create")
     public ResponseEntity<Void> create(@RequestBody Customer customer) {
-        valueOperations.create(customer);
+//        valueOperations.create(customer);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/update")
     public ResponseEntity<Void> update(Customer customer) {
-        valueOperations.create(customer);
+//        valueOperations.create(customer);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/info")
     public ResponseEntity<Customer> getInfo() {
-        Customer value = valueOperations.getValue();
-        return new ResponseEntity<>(value, HttpStatus.OK);
+//        Customer value = valueOperations.getValue();
+//        return new ResponseEntity<>(value, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> delete() {
-        valueOperations.deleted();
+//        valueOperations.deleted();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

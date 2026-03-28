@@ -1,16 +1,23 @@
-version: '3.9'
 services:
   redis:
-    image: docker.io/bitnami/redis:7.0
+    image: redis:8.6.1
     container_name: redis
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - REDIS_PASSWORD=duytc
-      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    command: >
+      redis-server
+      --requirepass duytc
+      --appendonly yes
+      --appendfsync everysec
+      --rename-command FLUSHDB ""
+      --rename-command FLUSHALL ""
     ports:
-      - '6379:6379'
+      - "6379:6379"   # bỏ nếu chạy internal
     volumes:
-      - /Users/duytc/Documents/Docker/Docker-data/redis:/data
-volumes:
-  redis:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a duytc ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+volumes:
+  redis_data:
