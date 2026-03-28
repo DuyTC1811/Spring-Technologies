@@ -29,19 +29,19 @@ spring:
     verified-token: 9QZaVt1gRjmNWtEPksgNaJ7OT6OmnbNQxxx334sdeaFxxx3
     verified-token-time: 900000
 
-#  mail:
-#    default-encoding: UTF-8
-#    host: smtp.gmail.com
-#    port: 587
-#    username: hulkhulk1245@gmail.com
-#    password: tcjdgzuimnyzrfsi
-#    mail-from: hulkhulk1245@gmail.com
-#    protocol: smtp
-#    test-connection: true
-#    properties:
-#      mail.smtp.auth: true
-#      mail.smtp.starttls.enable: true
-#      mail.smtp.starttls.required: true
+  #  mail:
+  #    default-encoding: UTF-8
+  #    host: smtp.gmail.com
+  #    port: 587
+  #    username: hulkhulk1245@gmail.com
+  #    password: tcjdgzuimnyzrfsi
+  #    mail-from: hulkhulk1245@gmail.com
+  #    protocol: smtp
+  #    test-connection: true
+  #    properties:
+  #      mail.smtp.auth: true
+  #      mail.smtp.starttls.enable: true
+  #      mail.smtp.starttls.required: true
 
   freemarker:
     template-loader-path: classpath:/templates/mail
@@ -63,13 +63,20 @@ mybatis:
 
 cors:
   allowed:
-    origins: "http://localhost:4200"
-    methods: "GET,POST,PUT,DELETE"
-    headers: "Content-Type,Authorization"
+    origins:
+      - http://localhost:4200
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+    headers:
+      - Content-Type
+      - Authorization
   permit-all:
     endpoint:
-      /swagger-ui/**,
-      /v3/api-docs/**,
-      /swagger-resources/**,
-      /webjars/**,
-      /api/auth/**,
+      - /swagger-ui/**
+      - /v3/api-docs/**
+      - /swagger-resources/**
+      - /webjars/**
+      - /api/auth/**
