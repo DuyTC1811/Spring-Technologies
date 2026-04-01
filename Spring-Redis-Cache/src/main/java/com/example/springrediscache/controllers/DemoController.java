@@ -1,5 +1,6 @@
 package com.example.springrediscache.controllers;
 
+import com.example.springrediscache.entity.Customer;
 import com.example.springrediscache.service.IRedisCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +18,23 @@ public class DemoController {
 
     @PostMapping("/put-cache")
     public String create() {
-        cacheService.setValue("key", "duytc", Duration.ofHours(1));
+        Customer customer = Customer
+                .builder()
+                .id(1)
+                .firstName("DuyTC")
+                .lastName("Nguyen")
+                .email("noname@gmail.com")
+                .gender("Male")
+                .contactNo("0987654321")
+                .country("Vietnam")
+                .dob("1999-01-01")
+                .build();
+        cacheService.setValue("key", customer, Duration.ofHours(1));
         return "Create";
     }
 
     @GetMapping("/get-cache")
-    public String hello() {
-        return cacheService.getValue("key", String.class);
+    public Object hello() {
+        return cacheService.getValue("key", Customer.class);
     }
 }
