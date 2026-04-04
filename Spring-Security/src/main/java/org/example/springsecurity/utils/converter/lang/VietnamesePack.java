@@ -1,4 +1,4 @@
-package org.example.springsecurity.util.converter.lang;
+package org.example.springsecurity.utils.converter.lang;
 
 public final class VietnamesePack implements LanguagePack {
     private static final String[] BELOW_20 = {

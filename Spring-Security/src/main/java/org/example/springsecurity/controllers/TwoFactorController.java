@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.example.springsecurity.enums.EException.OTP_IS_INCORRECT;
-import static org.example.springsecurity.util.TOTPUtil.generateSecret;
+import static org.example.springsecurity.utils.TOTPUtil.generateSecret;
 
 @RestController
 @RequiredArgsConstructor

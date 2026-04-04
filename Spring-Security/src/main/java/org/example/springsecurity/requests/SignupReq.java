@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
-import static org.example.springsecurity.util.RegexUtil.REGEX_EMAIL;
-import static org.example.springsecurity.util.RegexUtil.REGEX_PHONE_NUMBER;
-import static org.example.springsecurity.util.RegexUtil.REGEX_USERNAME;
+import static org.example.springsecurity.utils.RegexUtil.REGEX_EMAIL;
+import static org.example.springsecurity.utils.RegexUtil.REGEX_PHONE_NUMBER;
+import static org.example.springsecurity.utils.RegexUtil.REGEX_USERNAME;
 
 
 @Getter

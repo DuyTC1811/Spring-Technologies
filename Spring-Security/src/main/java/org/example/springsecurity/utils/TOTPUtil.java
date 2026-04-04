@@ -1,4 +1,4 @@
-package org.example.springsecurity.util;
+package org.example.springsecurity.utils;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.codec.binary.Base32;

@@ -1,14 +1,14 @@
-package org.example.springsecurity.util.converter;
+package org.example.springsecurity.utils.converter;
 
 import lombok.experimental.UtilityClass;
-import org.example.springsecurity.util.converter.currency.CurrencyPack;
-import org.example.springsecurity.util.converter.currency.EurPack;
-import org.example.springsecurity.util.converter.currency.UsdPack;
-import org.example.springsecurity.util.converter.currency.VndPack;
-import org.example.springsecurity.util.converter.lang.EnglishPack;
-import org.example.springsecurity.util.converter.lang.FrenchPack;
-import org.example.springsecurity.util.converter.lang.LanguagePack;
-import org.example.springsecurity.util.converter.lang.VietnamesePack;
+import org.example.springsecurity.utils.converter.currency.CurrencyPack;
+import org.example.springsecurity.utils.converter.currency.EurPack;
+import org.example.springsecurity.utils.converter.currency.UsdPack;
+import org.example.springsecurity.utils.converter.currency.VndPack;
+import org.example.springsecurity.utils.converter.lang.EnglishPack;
+import org.example.springsecurity.utils.converter.lang.FrenchPack;
+import org.example.springsecurity.utils.converter.lang.LanguagePack;
+import org.example.springsecurity.utils.converter.lang.VietnamesePack;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

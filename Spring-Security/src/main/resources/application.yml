@@ -82,3 +82,4 @@ cors:
       - /api/auth/**
       - /api/2fa/setup/**
       - /api/2fa/**
+      - /api/test/**

@@ -1,4 +1,4 @@
-package org.example.springsecurity.util.converter.lang;
+package org.example.springsecurity.utils.converter.lang;
 
 import lombok.experimental.UtilityClass;
 

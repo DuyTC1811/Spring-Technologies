@@ -1,6 +1,6 @@
-package org.example.springsecurity.util;
+package org.example.springsecurity.utils;
 
-import org.example.springsecurity.util.converter.NumberToWords;
+import org.example.springsecurity.utils.converter.NumberToWords;
 
 import java.math.BigDecimal;
 

@@ -1,10 +1,8 @@
-package org.example.springsecurity.util;
+package org.example.springsecurity.utils;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Map;
 
 @Getter

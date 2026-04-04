@@ -14,7 +14,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import static org.example.springsecurity.enums.EException.OTP_INVALID;
-import static org.example.springsecurity.util.TOTPUtil.genCode;
+import static org.example.springsecurity.utils.TOTPUtil.genCode;
 
 @Service
 public class TwoFactorServiceImpl implements ITwoFactorService {

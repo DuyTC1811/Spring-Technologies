@@ -1,4 +1,4 @@
-package org.example.springsecurity.util.converter.lang;
+package org.example.springsecurity.utils.converter.lang;
 
 /**
  * Định nghĩa toàn bộ từ vựng và quy tắc format cho một ngôn ngữ.

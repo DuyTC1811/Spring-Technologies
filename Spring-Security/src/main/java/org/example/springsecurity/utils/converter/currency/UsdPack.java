@@ -1,4 +1,4 @@
-package org.example.springsecurity.util.converter.currency;
+package org.example.springsecurity.utils.converter.currency;
 
 public final class UsdPack implements CurrencyPack {
     @Override

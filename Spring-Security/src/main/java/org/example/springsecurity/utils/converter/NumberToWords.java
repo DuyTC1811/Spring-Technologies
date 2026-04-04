@@ -1,7 +1,8 @@
-package org.example.springsecurity.util.converter;
+package org.example.springsecurity.utils.converter;
 
-import org.example.springsecurity.util.converter.lang.LanguagePack;
-import org.example.springsecurity.util.converter.lang.ThreeDigitFormatter;
+import org.example.springsecurity.utils.converter.currency.CurrencyPack;
+import org.example.springsecurity.utils.converter.lang.LanguagePack;
+import org.example.springsecurity.utils.converter.lang.ThreeDigitFormatter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -89,7 +90,7 @@ public final class NumberToWords {
      */
     public static String convert(BigDecimal value, String langCode, String currencyCode) {
         LanguagePack lp = PackRegistry.getLanguage(langCode);
-        org.example.springsecurity.util.converter.currency.CurrencyPack cp = PackRegistry.getCurrency(currencyCode);
+        CurrencyPack cp = PackRegistry.getCurrency(currencyCode);
 
         boolean negative = value.signum() < 0;
         BigDecimal abs = value.abs();

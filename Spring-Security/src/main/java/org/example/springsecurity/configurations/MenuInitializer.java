@@ -1,6 +1,8 @@
 package org.example.springsecurity.configurations;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -10,19 +12,20 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MenuInitializer implements ApplicationRunner {
     private final RequestMappingHandlerMapping mapping;
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void run(@NonNull ApplicationArguments args) {
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
         for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : map.entrySet()) {
             RequestMappingInfo key = entry.getKey();
             HandlerMethod value = entry.getValue();
-            System.out.println("RequestMappingInfo: " + key);
-            System.out.println("HandlerMethod: " + value);
+            log.info("{}", key);
+            log.info("{}", value);
         }
     }
 }
