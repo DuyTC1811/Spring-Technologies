@@ -6,11 +6,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.springsecurity.configurations.caffeine.ICacheService;
+import org.example.springsecurity.configurations.properties.SecurityProperties;
 import org.example.springsecurity.configurations.security.UserInfoServiceImpl;
 import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.handlers.impl.AuthenticationHandlerImpl;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,8 +23,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @NullMarked
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
-    @Value("${spring.jwt.access-token}")
-    private String secretAccessToken;
+    private final SecurityProperties securityProperties;
 
     private final JwtUtil jwtUtil;
     private final ICacheService cacheService;
@@ -44,20 +43,20 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String jti = jwtUtil.extractJti(jwtToken, secretAccessToken);
+            String jti = jwtUtil.extractJti(jwtToken, securityProperties.getAccessSecret());
             String cache = cacheService.getCache(AuthenticationHandlerImpl.BLACKLIST_PREFIX + jti);
             if (StringUtils.isNoneBlank(cache)) {
                 throw new BaseException(403, "Token của bạn không hợp lệ vui lòng đăng nhập lại");
             }
 
-            var username = jwtUtil.extractUsername(jwtToken, secretAccessToken);
-            var tokenVersion = jwtUtil.extractVersion(jwtToken, secretAccessToken);
+            var username = jwtUtil.extractUsername(jwtToken, securityProperties.getAccessSecret());
+            var tokenVersion = jwtUtil.extractVersion(jwtToken, securityProperties.getAccessSecret());
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (username != null && authentication == null) {
                 var userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtUtil.isTokenValid(jwtToken, secretAccessToken, userDetails)) {
+                if (jwtUtil.isTokenValid(jwtToken, securityProperties.getAccessSecret(), userDetails)) {
 
                     if (tokenVersion == null || userDetails.getTokenVersion() != tokenVersion) {
                         throw new BaseException(403, "Token của bạn không hợp lệ vui lòng đăng nhập lại");

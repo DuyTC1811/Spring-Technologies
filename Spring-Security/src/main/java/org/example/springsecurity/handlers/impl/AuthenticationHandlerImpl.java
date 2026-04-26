@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.configurations.caffeine.ICacheService;
 import org.example.springsecurity.configurations.jwt.JwtUtil;
+import org.example.springsecurity.configurations.properties.SecurityProperties;
 import org.example.springsecurity.configurations.security.UserInfo;
 import org.example.springsecurity.configurations.security.UserInfoServiceImpl;
 import org.example.springsecurity.exceptions.BaseException;
@@ -25,7 +26,6 @@ import org.example.springsecurity.responses.RefreshTokenResp;
 import org.example.springsecurity.responses.SignupResp;
 import org.example.springsecurity.responses.UpdatePasswordResp;
 import org.example.springsecurity.responses.ValidateTokenResp;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,20 +47,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     public static final String BLACKLIST_PREFIX = "blacklist:";
 
-    @Value("${spring.security.access-token}")
-    private String accessSecretToken;
-    @Value("${spring.security.access-token-time}")
-    private int accessExpiryTime;
-
-    @Value("${spring.security.refresh-token}")
-    private String refreshSecretToken;
-    @Value("${spring.security.refresh-token-time}")
-    private int refreshExpiryTime;
-
-    @Value("${spring.security.verified-token}")
-    private String verifiedToken;
-    @Value("${spring.security.verified-token-time}")
-    private int verifiedTokenTime;
+    private final SecurityProperties securityProperties;
 
     private final JwtUtil jwtUtil;
     private final IRoleHandler roleHandler;
@@ -120,10 +107,10 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username(userInfo.getUsername())
-                .accessKey(accessSecretToken)
-                .accessExpireTime(accessExpiryTime)
-                .refreshKey(refreshSecretToken)
-                .refreshExpireTime(refreshExpiryTime)
+                .accessKey(securityProperties.getAccessSecret())
+                .accessExpireTime((int) securityProperties.getAccessTime())
+                .refreshKey(securityProperties.getRefreshSecret())
+                .refreshExpireTime((int) securityProperties.getRefreshTime())
                 .version(userInfo.getTokenVersion())
                 .build();
 
@@ -137,17 +124,17 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     @Transactional
     public RefreshTokenResp refreshToken(RefreshTokenReq request) {
         String oldRefreshToken = request.getRefreshToken();
-        if (jwtUtil.isTokenValid(oldRefreshToken, refreshSecretToken)) {
+        if (jwtUtil.isTokenValid(oldRefreshToken, securityProperties.getRefreshSecret())) {
             throw new BaseException(FORBIDDEN.value(), "Token của bạn không hợp lệ vui lòng đăng nhập lại");
         }
 
-        String oldJti = jwtUtil.extractJti(oldRefreshToken, refreshSecretToken);
+        String oldJti = jwtUtil.extractJti(oldRefreshToken, securityProperties.getRefreshSecret());
         if (isBlacklisted(oldJti)) {
             throw new BaseException(FORBIDDEN.value(), "Token của bạn không hợp lệ vui lòng đăng nhập lại");
         }
 
-        Integer version = jwtUtil.extractVersion(oldRefreshToken, refreshSecretToken);
-        String username = jwtUtil.extractUsername(oldRefreshToken, refreshSecretToken);
+        Integer version = jwtUtil.extractVersion(oldRefreshToken, securityProperties.getRefreshSecret());
+        String username = jwtUtil.extractUsername(oldRefreshToken, securityProperties.getRefreshSecret());
         var userDetails = userDetailsService.loadUserByUsername(username);
 
         if (version == null || version != userDetails.getTokenVersion()) {
@@ -155,16 +142,16 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         }
 
         // Rotate: blacklist refresh token cũ TRƯỚC khi phát hành token mới để chặn replay.
-        Date oldExpiration = jwtUtil.extractExpiration(oldRefreshToken, refreshSecretToken);
+        Date oldExpiration = jwtUtil.extractExpiration(oldRefreshToken, securityProperties.getRefreshSecret());
         blacklistToken(oldJti, oldExpiration);
 
         GenerateTokenInfo generateTokenInfo = GenerateTokenInfo.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username(userDetails.getUsername())
-                .accessKey(accessSecretToken)
-                .accessExpireTime(accessExpiryTime)
-                .refreshKey(refreshSecretToken)
-                .refreshExpireTime(refreshExpiryTime)
+                .accessKey(securityProperties.getAccessSecret())
+                .accessExpireTime((int) securityProperties.getAccessTime())
+                .refreshKey(securityProperties.getRefreshSecret())
+                .refreshExpireTime((int) securityProperties.getRefreshTime())
                 .version(userDetails.getTokenVersion())
                 .build();
 
@@ -190,7 +177,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
     @Override
     public ValidateTokenResp validateToken(ValidateTokenReq request) {
-        if (jwtUtil.isTokenValid(request.getToken(), verifiedToken)) {
+        if (jwtUtil.isTokenValid(request.getToken(), securityProperties.getVerifiedSecret())) {
             throw new BaseException(FORBIDDEN.value(), "Token invalid");
         }
         return new ValidateTokenResp("Successfully validated token");
@@ -206,7 +193,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
                 .uuid(UUID.randomUUID().toString())
                 .username(userInfo.getUsername())
                 .build();
-        String generateToken = jwtUtil.verifiedToken(tokenInfo, verifiedToken, verifiedTokenTime);
+        String generateToken = jwtUtil.verifiedToken(tokenInfo, securityProperties.getVerifiedSecret(), (int) securityProperties.getVerifiedTime());
 
         // TODO send mail
         // mailService.sendMailForgotPassword(generateToken, userInfo.getEmail());
@@ -225,8 +212,8 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
         String assetToken = jwtUtil.parseJwt(request);
         if (assetToken != null) {
             try {
-                String jti = jwtUtil.extractJti(assetToken, accessSecretToken);
-                Date expiration = jwtUtil.extractExpiration(assetToken, accessSecretToken);
+                String jti = jwtUtil.extractJti(assetToken, securityProperties.getAccessSecret());
+                Date expiration = jwtUtil.extractExpiration(assetToken, securityProperties.getAccessSecret());
                 blacklistToken(jti, expiration);
             } catch (Exception ignored) {
                 // token malformed/expired → bỏ qua, chỉ cần clear security context.
