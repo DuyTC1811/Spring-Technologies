@@ -14,7 +14,6 @@ import org.example.springsecurity.handlers.IAuthenticationHandler;
 import org.example.springsecurity.handlers.IRoleHandler;
 import org.example.springsecurity.models.GenerateTokenInfo;
 import org.example.springsecurity.repositories.IAuthenticationMapper;
-import org.example.springsecurity.repositories.ITokenStorageMapper;
 import org.example.springsecurity.requests.ForgotPasswordReq;
 import org.example.springsecurity.requests.LoginReq;
 import org.example.springsecurity.requests.RefreshTokenReq;
@@ -56,7 +55,6 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     private final IRoleHandler roleHandler;
     private final ICacheService cacheService;
     private final IAuthenticationMapper authMapper;
-    private final ITokenStorageMapper tokenStorageMapper;
     private final UserInfoServiceImpl userDetailsService;
 
     // private final IMailService mailService;
@@ -187,7 +185,6 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
         authMapper.updatePassword(userInfo.getUsername(), passwordEncoder.encode(request.getNewPassword()));
         // Bump version → invalidate toàn bộ access/refresh token cũ.
-        tokenStorageMapper.updateTokenVersion(userInfo.getUsername());
         return new UpdatePasswordResp("Successfully updated password");
     }
 
