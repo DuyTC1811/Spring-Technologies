@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.handlers.IRoleHandler;
 import org.example.springsecurity.repositories.IRoleMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RoleHandlerImpl implements IRoleHandler {
     private final IRoleMapper roleMapper;

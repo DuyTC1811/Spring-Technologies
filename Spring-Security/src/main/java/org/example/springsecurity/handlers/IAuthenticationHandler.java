@@ -14,6 +14,7 @@ import org.example.springsecurity.responses.RefreshTokenResp;
 import org.example.springsecurity.responses.SignupResp;
 import org.example.springsecurity.responses.UpdatePasswordResp;
 import org.example.springsecurity.responses.ValidateTokenResp;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
@@ -22,7 +23,7 @@ public interface IAuthenticationHandler extends LogoutHandler {
 
     LoginResp login(LoginReq loginRequest);
 
-    void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication);
+    void logout(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, Authentication authentication);
 
     RefreshTokenResp refreshToken(RefreshTokenReq request);
 

@@ -23,7 +23,7 @@ public class UserInfoServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException(username);
         }
         Set<String> roleCodes = roleMapper.findRoleByUserId(userInfo.getUserId());
-        userInfo.setAuthorities(roleCodes);
+        userInfo.setRoleCodes(roleCodes);
         return userInfo;
     }
 }

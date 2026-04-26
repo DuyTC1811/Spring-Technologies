@@ -3,6 +3,7 @@ package org.example.springsecurity.handlers.impl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.example.springsecurity.configurations.caffeine.ICacheService;
 import org.example.springsecurity.configurations.jwt.JwtUtil;
 import org.example.springsecurity.configurations.properties.SecurityProperties;
@@ -26,12 +27,14 @@ import org.example.springsecurity.responses.RefreshTokenResp;
 import org.example.springsecurity.responses.SignupResp;
 import org.example.springsecurity.responses.UpdatePasswordResp;
 import org.example.springsecurity.responses.ValidateTokenResp;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.util.Date;
@@ -62,6 +65,11 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     @Override
     @Transactional
     public SignupResp signup(SignupReq request) {
+
+        if (!StringUtils.hasText(request.getPassword())) {
+            throw new BaseException(400, "Mật khẩu không được để trống");
+        }
+
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new BaseException(400, "Mật khẩu không khớp");
         }
@@ -83,6 +91,9 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
         authMapper.signup(request);
         Set<String> roleIds = roleHandler.findByRoleCode(Set.of("USER"));
+        if (CollectionUtils.isEmpty(roleIds)) {
+            throw new BaseException(500, "Default role USER not found");
+        }
         roleHandler.insertUserRole(userId, roleIds);
         // TODO send Email
         return new SignupResp("Register Success");
@@ -91,6 +102,11 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
     @Override
     @Transactional
     public LoginResp login(LoginReq loginReq) {
+
+        if (!StringUtils.hasText(loginReq.getPassword())) {
+            throw new BaseException(400, "Mật khẩu không được để trống");
+        }
+
         UserInfo userInfo = authMapper.findByUsername(loginReq.getUsername());
         if (Objects.isNull(userInfo)) {
             throw new BaseException(400, "tai khoan mat khau khong dung");
@@ -207,7 +223,7 @@ public class AuthenticationHandlerImpl implements IAuthenticationHandler {
 
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    public void logout(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, Authentication authentication) {
         response.setStatus(HttpStatus.OK.value());
         String assetToken = jwtUtil.parseJwt(request);
         if (assetToken != null) {

@@ -2,6 +2,7 @@ package org.example.springsecurity.configurations.security;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,11 +28,33 @@ public class UserInfo implements UserDetails {
     public UserInfo() {
     }
 
-    public void setAuthorities(Set<String> roleCodes) {
+    public void setRoleCodes(Set<String> roleCodes) {
+        if (CollectionUtils.isEmpty(roleCodes)) {
+            return;
+        }
+
         this.authorities.addAll(roleCodes.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toSet())
-        );
+                .collect(Collectors.toSet()));
+    }
+
+    public void setPermissionCodes(Set<String> permissionCodes) {
+        if (CollectionUtils.isEmpty(permissionCodes)) {
+            return;
+        }
+
+        this.authorities.addAll(permissionCodes.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toSet()));
+    }
+
+    public boolean hasAuthority(String authority) {
+        return this.authorities.stream()
+                .anyMatch(item -> Objects.equals(item.getAuthority(), authority));
+    }
+
+    public boolean hasRole(String roleCode) {
+        return hasAuthority("ROLE_" + roleCode);
     }
 
     @Override
@@ -49,31 +72,19 @@ public class UserInfo implements UserDetails {
         return username;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
+    public boolean isActive() {
+        return "ACTIVE".equalsIgnoreCase(status);
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isActive();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserInfo user = (UserInfo) o;
+        if (!(o instanceof UserInfo user)) return false;
         return Objects.equals(userId, user.userId);
     }
 
