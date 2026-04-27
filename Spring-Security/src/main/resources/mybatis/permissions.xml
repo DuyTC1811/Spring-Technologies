@@ -1,0 +1,17 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.springsecurity.mappers.IPermissionsMapper">
+
+    <select id="findPermissionsByUserId" resultType="string">
+        SELECT DISTINCT P.PER_CODE
+        FROM USER_ROLES UR
+                 INNER JOIN ROLES R ON UR.ROLE_ID = R.ROLE_ID
+                 INNER JOIN ROLE_PERMISSIONS RP ON R.ROLE_ID = RP.ROLE_ID
+                 INNER JOIN PERMISSIONS P ON RP.PER_ID = P.PER_ID
+        WHERE UR.USER_ID = #{userId}
+          AND R.ENABLED = TRUE
+          AND RP.ENABLED = TRUE
+          AND P.ENABLED = TRUE
+    </select>
+
+</mapper>

@@ -24,7 +24,6 @@
         FROM USER_ROLES U
                  INNER JOIN ROLES R ON U.ROLE_ID = R.ROLE_ID
         WHERE U.USER_ID = #{userId}
-          AND U.ENABLED = TRUE
           AND R.ENABLED = TRUE
     </select>
 
