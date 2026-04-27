@@ -31,6 +31,10 @@ databaseChangeLog:
       file: changelog/changelog-table/08-table-permission-policies.sql
       relativeToChangelogFile: true
 
+  - include:
+      file: changelog/changelog-table/09-table-category.sql
+      relativeToChangelogFile: true
+
 # INSERT DEFAULT DATA
   - include:
       file: changelog/default-data/01-seed-permissions.sql
@@ -42,4 +46,8 @@ databaseChangeLog:
 
   - include:
       file: changelog/default-data/03-seed-role-permissions.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changelog/default-data/04-insert-default-categories.sql
       relativeToChangelogFile: true

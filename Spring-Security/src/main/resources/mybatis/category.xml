@@ -1,0 +1,96 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.springsecurity.mappers.ICategoryMapper">
+
+    <resultMap id="CategoryResultMap" type="org.example.springsecurity.models.CategoryInfo">
+        <id property="categoryId" column="CATEGORY_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="displayOrder" column="DISPLAY_ORDER"/>
+        <result property="enabled" column="ENABLED"/>
+        <result property="createdDate" column="CREATED_DATE"/>
+        <result property="updatedDate" column="UPDATED_DATE"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="org.example.springsecurity.models.CategoryInfo">
+        INSERT INTO CATEGORIES (CATEGORY_ID,
+                                       NAME,
+                                       DESCRIPTION,
+                                       DISPLAY_ORDER,
+                                       ENABLED,
+                                       CREATED_DATE,
+                                       UPDATED_DATE)
+        VALUES (#{categoryId},
+                #{name},
+                #{description},
+                #{displayOrder},
+                #{enabled},
+                CURRENT_TIMESTAMP,
+                NULL)
+    </insert>
+
+    <update id="update" parameterType="org.example.springsecurity.models.CategoryInfo">
+        UPDATE CATEGORIES
+        SET name          = #{name},
+            description   = #{description},
+            display_order = #{displayOrder},
+            enabled       = #{enabled},
+            updated_date  = CURRENT_TIMESTAMP
+        WHERE category_id = #{categoryId}
+    </update>
+
+    <update id="softDelete">
+        UPDATE CATEGORIES
+        SET enabled      = FALSE,
+            updated_date = CURRENT_TIMESTAMP
+        WHERE category_id = #{categoryId}
+    </update>
+
+    <select id="findById" resultMap="CategoryResultMap">
+        SELECT CATEGORY_ID,
+               NAME,
+               DESCRIPTION,
+               DISPLAY_ORDER,
+               ENABLED,
+               CREATED_DATE,
+               UPDATED_DATE
+        FROM CATEGORIES
+        WHERE CATEGORY_ID = #{categoryId}
+          AND ENABLED = TRUE
+    </select>
+
+    <select id="findList" resultMap="CategoryResultMap">
+        SELECT CATEGORY_ID,
+               NAME,
+               DESCRIPTION,
+               DISPLAY_ORDER,
+               ENABLED,
+               CREATED_DATE,
+               UPDATED_DATE
+        FROM CATEGORIES
+        WHERE ENABLED = TRUE
+        ORDER BY DISPLAY_ORDER ASC, CREATED_DATE DESC
+            LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(1)
+        FROM CATEGORIES
+        WHERE enabled = TRUE
+    </select>
+
+    <select id="existsByName" resultType="boolean">
+        SELECT EXISTS (SELECT 1
+                       FROM CATEGORIES
+                       WHERE LOWER(name) = LOWER(#{name}))
+    </select>
+
+    <select id="existsByNameExcludeId" resultType="boolean">
+        SELECT EXISTS (SELECT 1
+                       FROM CATEGORIES
+                       WHERE LOWER(name) = LOWER(#{name})
+                         AND category_id != #{categoryId})
+    </select>
+
+</mapper>
