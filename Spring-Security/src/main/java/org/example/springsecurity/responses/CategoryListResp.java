@@ -4,5 +4,5 @@ import org.example.springsecurity.models.CategoryInfo;
 
 import java.util.List;
 
-public record CategoryListResp(List<CategoryInfo> categories) {
+public record CategoryListResp(List<CategoryInfo> items) {
 }
