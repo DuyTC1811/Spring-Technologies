@@ -10,12 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Combo RBAC + ABAC. Caller dùng trong @PreAuthorize:
- *   @PreAuthorize("@authz.canAccess(authentication, 'PERM_X', #resource)")
- * RBAC quyết định trước (user có authority/role không); nếu pass mới đánh giá policy
- * rule (ABAC) gắn với permission.
- */
 @Slf4j
 @Component("authz")
 @RequiredArgsConstructor

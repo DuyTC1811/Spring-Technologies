@@ -38,7 +38,7 @@ public class TwoFactorController {
 
     private static final String KEY_PREFIX = "2fa:stepup:%s:%s";
 
-    @Operation(summary = "Khởi tạo 2FA: trả về QR code cho user đang đăng nhập")
+    @Operation(summary = "KHỞI TẠO 2FA: TRẢ VỀ QR CODE CHO USER ĐANG ĐĂNG NHẬP")
     @PostMapping("/setup")
     public ResponseEntity<byte[]> setup() {
         String username = currentUsername();
@@ -48,7 +48,7 @@ public class TwoFactorController {
                 .body(qrImage);
     }
 
-    @Operation(summary = "Xác nhận code sau khi scan QR để kích hoạt 2FA")
+    @Operation(summary = "XÁC NHẬN CODE SAU KHI SCAN QR ĐỂ KÍCH HOẠT 2FA")
     @PostMapping("/verify-setup")
     public ResponseEntity<String> confirm(@RequestBody @Valid OtpCodeReq req) {
         String username = currentUsername();
@@ -58,7 +58,7 @@ public class TwoFactorController {
         return ResponseEntity.ok("Bật 2FA thành công");
     }
 
-    @Operation(summary = "Verify OTP cho user đã bật 2FA")
+    @Operation(summary = "VERIFY OTP CHO USER ĐÃ BẬT 2FA")
     @PostMapping("/verify")
     public ResponseEntity<String> verify(@RequestBody @Valid OtpCodeReq req) {
         String username = currentUsername();

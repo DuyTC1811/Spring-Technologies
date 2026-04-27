@@ -1,0 +1,31 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.springsecurity.mappers.IPolicyMapper">
+
+    <select id="findRulesByPermissionCode" resultType="org.example.springsecurity.models.PolicyRule">
+
+        SELECT DISTINCT PO.POLICY_ID          AS policyId,
+                        PO.POLICY_CODE        AS policyCode,
+                        PO.EFFECT             AS effect,
+                        PR.RULE_ID            AS ruleId,
+                        PR.SUBJECT_ATTRIBUTE  AS subjectAttribute,
+                        PR.OPERATOR           AS operator,
+                        PR.RESOURCE_ATTRIBUTE AS resourceAttribute,
+                        PR.EXPECTED_VALUE     AS expectedValue,
+                        PR.DESCRIPTION        AS description
+        FROM PERMISSIONS P
+                 INNER JOIN PERMISSION_POLICIES PP
+                            ON P.PER_ID = PP.PER_ID
+                 INNER JOIN POLICIES PO
+                            ON PP.POLICY_ID = PO.POLICY_ID
+                 INNER JOIN POLICY_RULES PR
+                            ON PO.POLICY_ID = PR.POLICY_ID
+        WHERE P.PER_CODE = #{permissionCode}
+          AND P.ENABLED = TRUE
+          AND PP.ENABLED = TRUE
+          AND PO.ENABLED = TRUE
+          AND PR.ENABLED = TRUE
+
+    </select>
+
+</mapper>

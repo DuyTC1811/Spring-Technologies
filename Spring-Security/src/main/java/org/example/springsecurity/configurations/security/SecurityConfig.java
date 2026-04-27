@@ -38,18 +38,13 @@ public class SecurityConfig {
         String[] allowed = corsProperties.getPermitAll().getEndpoint();
         try {
             httpSecurity
-                    .csrf(AbstractHttpConfigurer::disable)                                  // Disable CSRF protection)
-                    .cors(cors -> cors.configurationSource(corsConfigurationSource()))      // Enable CORS with custom configuration
+                    .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection)
+                    .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS with custom configuration
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                     .authorizeHttpRequests(authorize -> authorize
                             .requestMatchers(allowed).permitAll()
-                            .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                            .requestMatchers("/api/user/**").hasAnyRole("USER")
-                            .requestMatchers("/api/technique/**").hasAnyRole("TECHNIQUE")
-                            .requestMatchers("/api/staff/**").hasAnyRole("STAFF")
                             .anyRequest().authenticated())
-
 
                     .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(unauthorizedHandler))
                     .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);  // JWT filter
