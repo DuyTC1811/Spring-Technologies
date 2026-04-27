@@ -13,7 +13,7 @@ import org.example.springsecurity.exceptions.BaseException;
 import org.example.springsecurity.handlers.IAuthenticationHandler;
 import org.example.springsecurity.handlers.IRoleHandler;
 import org.example.springsecurity.models.GenerateTokenInfo;
-import org.example.springsecurity.repositories.IAuthenticationMapper;
+import org.example.springsecurity.mappers.IAuthenticationMapper;
 import org.example.springsecurity.requests.ForgotPasswordReq;
 import org.example.springsecurity.requests.LoginReq;
 import org.example.springsecurity.requests.RefreshTokenReq;

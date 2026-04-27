@@ -1,8 +1,8 @@
 package org.example.springsecurity.configurations.security;
 
 import lombok.RequiredArgsConstructor;
-import org.example.springsecurity.repositories.IAuthenticationMapper;
-import org.example.springsecurity.repositories.IRoleMapper;
+import org.example.springsecurity.mappers.IAuthenticationMapper;
+import org.example.springsecurity.mappers.IRoleMapper;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

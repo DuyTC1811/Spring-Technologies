@@ -2,7 +2,7 @@ package org.example.springsecurity.handlers.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.springsecurity.handlers.IRoleHandler;
-import org.example.springsecurity.repositories.IRoleMapper;
+import org.example.springsecurity.mappers.IRoleMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

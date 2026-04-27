@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.springsecurity.configurations.security.UserInfo;
 import org.example.springsecurity.models.PolicyRule;
-import org.example.springsecurity.repositories.IPolicyMapper;
+import org.example.springsecurity.mappers.IPolicyMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 

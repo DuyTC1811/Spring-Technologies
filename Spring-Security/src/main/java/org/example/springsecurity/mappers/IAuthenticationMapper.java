@@ -1,4 +1,4 @@
-package org.example.springsecurity.repositories;
+package org.example.springsecurity.mappers;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;

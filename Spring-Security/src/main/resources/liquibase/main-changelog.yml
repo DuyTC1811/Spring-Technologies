@@ -1,16 +1,45 @@
 databaseChangeLog:
-  - includeAll:
-      path: changelog/changelog-table
+  - include:
+      file: changelog/changelog-table/01-table-users.sql
       relativeToChangelogFile: true
-  - includeAll:
-      path: changelog/default-data
+
+  - include:
+      file: changelog/changelog-table/02-table-roles.sql
       relativeToChangelogFile: true
-#  - includeAll:
-#      path: changelog-index
-#      relativeToChangelogFile: true
-#  - includeAll:
-#      path: changelog-procedure
-#      relativeToChangelogFile: true
-#  - includeAll:
-#      path: changelog-view
-#      relativeToChangelogFile: true
+
+  - include:
+      file: changelog/changelog-table/03-table-permissions.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changelog/changelog-table/04-table-user-role.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changelog/changelog-table/05-table-role-permissions.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changelog/changelog-table/06-table-policies.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changelog/changelog-table/07-table-policy-rules.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changelog/changelog-table/08-table-permission-policies.sql
+      relativeToChangelogFile: true
+
+# INSERT DEFAULT DATA
+  - include:
+      file: changelog/default-data/01-seed-permissions.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changelog/default-data/02-seed-roles.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: changelog/default-data/03-seed-role-permissions.sql
+      relativeToChangelogFile: true
