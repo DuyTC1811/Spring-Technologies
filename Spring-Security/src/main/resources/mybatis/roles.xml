@@ -2,15 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.example.springsecurity.mappers.IRoleMapper">
+
     <select id="findByRoleCode" resultType="string">
-        SELECT ROLE_ID FROM ROLES WHERE ROLE_CODE IN
-        <foreach item="item" index="index" collection="roleCodes" open="(" separator="," close=")">
-            #{item}
+        SELECT R.ROLE_ID FROM ROLES R WHERE R.ROLE_CODE IN
+        <foreach item="roleCode" collection="roleCodes" open="(" separator="," close=")">
+            #{roleCode}
         </foreach>
+        AND R.ENABLED = TRUE
     </select>
 
     <insert id="insertUserRole">
-        INSERT INTO USER_ROLE (USER_ID, ROLE_ID)
+        INSERT INTO USER_ROLES (USER_ID, ROLE_ID)
         VALUES
         <foreach collection="roleIds" item="roleId" separator=",">
             (#{userId}, #{roleId})
@@ -18,7 +20,12 @@
     </insert>
 
     <select id="findRoleByUserId" resultType="string">
-        SELECT R.ROLE_CODE FROM USER_ROLE U LEFT JOIN ROLES R ON U.ROLE_ID = R.ROLE_ID WHERE USER_ID = #{userId}
+        SELECT R.ROLE_CODE
+        FROM USER_ROLES U
+                 INNER JOIN ROLES R ON U.ROLE_ID = R.ROLE_ID
+        WHERE U.USER_ID = #{userId}
+          AND U.ENABLED = TRUE
+          AND R.ENABLED = TRUE
     </select>
 
 </mapper>

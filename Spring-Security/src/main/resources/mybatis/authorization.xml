@@ -1,0 +1,37 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.springsecurity.mappers.IAuthorizationMapper">
+
+    <select id="existsUserById" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM USERS U
+        WHERE U.USER_ID = #{userId}
+          AND U.ENABLED = TRUE
+    </select>
+
+    <select id="existsRoleById" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM ROLES R
+        WHERE R.ROLE_ID = #{roleId}
+          AND R.ENABLED = TRUE
+    </select>
+
+    <select id="existsUserRole" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM USER_ROLES UR
+                 INNER JOIN ROLES R ON UR.ROLE_ID = R.ROLE_ID
+        WHERE UR.USER_ID = #{userId}
+          AND UR.ROLE_ID = #{roleId}
+          AND R.ENABLED = TRUE
+    </select>
+
+    <insert id="insertUserRole">
+        INSERT INTO USER_ROLE (ID, USER_ID, ROLE_ID, ENABLED, CREATED_DATE, UPDATED_DATE)
+        VALUES (#{id},#{userId}, #{roleId}, TRUE, CURRENT_TIMESTAMP, NULL)
+    </insert>
+
+    <delete id="deleteUserRole">
+        DELETE FROM USER_ROLE WHERE USER_ID = #{userId} AND ROLE_ID = #{roleId}
+    </delete>
+
+</mapper>
