@@ -1,19 +1,32 @@
 spring:
   data:
     redis:
+      host: 127.0.0.1
+      port: 6379
+      password: duytc
       timeout: 3000ms
 
-      cluster:
-        nodes:
-          - 127.0.0.1:7001
-          - 127.0.0.1:7002
-          - 127.0.0.1:7003
-        max-redirects: 5
+#      cluster:
+#        nodes:
+#          - 127.0.0.1:7001
+#          - 127.0.0.1:7002
+#          - 127.0.0.1:7003
+#        max-redirects: 5
 
       lettuce:
+        shutdown-timeout: 100ms
         pool:
+          enabled: true
           max-active: 32
           max-idle: 16
           min-idle: 4
           max-wait: 3000ms
-        shutdown-timeout: 100ms
+
+#logging:
+#  level:
+#    io.lettuce.core: DEBUG
+#    io.lettuce.core.protocol: DEBUG
+#    io.lettuce.core.cluster: DEBUG
+#    io.lettuce.core.cluster.topology: DEBUG
+#    org.springframework.data.redis: DEBUG
+#    org.springframework.data.redis.connection.lettuce: DEBUG
