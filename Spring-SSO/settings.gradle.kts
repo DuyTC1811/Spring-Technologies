@@ -1,1 +1,1 @@
-rootProject.name = 'Spring-SSO'
+rootProject.name = "Spring-SSO"
