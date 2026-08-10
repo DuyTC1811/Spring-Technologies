@@ -24,40 +24,47 @@ spring:
     oauth2:
       client:
         registration:
-          facebook:
-            client-id: 1031113005690288
-            client-secret: 9d26a40af9775f52e4033be9313f7ddb
-            scope: email, public_profile
-          kakao:
-            client-id: ed76e2a2ea00a5c50957ff1763a4b376
-            client-secret: rIVftGWrmSoV9eBV5v3dqhvfCw1T9Np3
-            authorization-grant-type: authorization_code
-            scope: profile_nickname
-            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
-            client-authentication-method: client_secret_post
-          nave:
-            client-id: ed76e2a2ea00a5c50957ff1763a4b376
-            client-secret: rIVftGWrmSoV9eBV5v3dqhvfCw1T9Np3
-            authorization-grant-type: authorization_code
-            scope: profile_nickname
-            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
-            client-authentication-method: client_secret_post
+          keycloak:
+            client-id: food-ordering-client
+            client-secret: your-client-secret
+            scope: openid,profile,email
+            redirect-uri: http://localhost:8082/login/oauth2/code/keycloak
+#          facebook:
+#            client-id: 1031113005690288
+#            client-secret: 9d26a40af9775f52e4033be9313f7ddb
+#            scope: email, public_profile
+#          kakao:
+#            client-id: ed76e2a2ea00a5c50957ff1763a4b376
+#            client-secret: rIVftGWrmSoV9eBV5v3dqhvfCw1T9Np3
+#            authorization-grant-type: authorization_code
+#            scope: profile_nickname
+#            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
+#            client-authentication-method: client_secret_post
+#          nave:
+#            client-id: ed76e2a2ea00a5c50957ff1763a4b376
+#            client-secret: rIVftGWrmSoV9eBV5v3dqhvfCw1T9Np3
+#            authorization-grant-type: authorization_code
+#            scope: profile_nickname
+#            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
+#            client-authentication-method: client_secret_post
 
         provider:
-          facebook:
-            authorization-uri: https://www.facebook.com/dialog/oauth
-            token-uri: https://graph.facebook.com/oauth/access_token
-            user-name-attribute: id
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
-          nave:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
+          keycloak:
+            issuer-uri: http://localhost:8088/realms/food-ordering-realm
+#          facebook:
+#            authorization-uri: https://www.facebook.com/dialog/oauth
+#            token-uri: https://graph.facebook.com/oauth/access_token
+#            user-name-attribute: id
+#          kakao:
+#            authorization-uri: https://kauth.kakao.com/oauth/authorize
+#            token-uri: https://kauth.kakao.com/oauth/token
+#            user-info-uri: https://kapi.kakao.com/v2/user/me
+#            user-name-attribute: id
+#          nave:
+#            authorization-uri: https://kauth.kakao.com/oauth/authorize
+#            token-uri: https://kauth.kakao.com/oauth/token
+#            user-info-uri: https://kapi.kakao.com/v2/user/me
+#            user-name-attribute: id
 
 cors:
   allowed:
@@ -74,4 +81,5 @@ cors:
 
 logging:
   level:
+    org.springframework.security: DEBUG
     org.springframework.security.oauth2: DEBUG
