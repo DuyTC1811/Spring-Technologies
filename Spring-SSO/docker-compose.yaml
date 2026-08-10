@@ -1,44 +1,53 @@
 services:
   postgres:
-    image: postgres:latest
-    container_name: postgres_db
-    restart: always
+    image: postgres:17-alpine
+    container_name: keycloak-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: password123
+      POSTGRES_PASSWORD: duytc
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - keycloak_network
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: [ "CMD-SHEEP", "pg_isready", "-U", "keycloak" ]
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
+    networks:
+      - keycloak-network
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
-    container_name: keycloak_auth
-    restart: always
-    command: start-dev
+    container_name: keycloak
+    restart: unless-stopped
+    command:
+      - start-dev
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: adminpassword
+      KC_BOOTSTRAP_ADMIN_PASSWORD: duytc
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
       KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: password123
+      KC_DB_PASSWORD: duytc
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_LOG_LEVEL: INFO
     ports:
       - "8080:8080"
+      - "9000:9000"
     depends_on:
       postgres:
         condition: service_healthy
     networks:
-      - keycloak_network
+      - keycloak-network
 
 volumes:
-  postgres_data:
+  postgres-data:
 
 networks:
-  keycloak_network:
+  keycloak-network:
+    driver: bridge
