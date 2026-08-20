@@ -4,9 +4,9 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: anhduy12
+    url: jdbc:postgresql://192.168.122.102:5432/postgres
+    username: keycloak
+    password: duytc
     hikari:
       auto-commit: true
       minimum-idle: 1
@@ -19,6 +19,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: true
 
   security:
     oauth2:
@@ -28,7 +29,7 @@ spring:
             client-id: food-ordering-client
             client-secret: your-client-secret
             scope: openid,profile,email
-            redirect-uri: http://localhost:8082/login/oauth2/code/keycloak
+            redirect-uri: http://192.168.122.102:8080/login/oauth2/code/keycloak
 #          facebook:
 #            client-id: 1031113005690288
 #            client-secret: 9d26a40af9775f52e4033be9313f7ddb
@@ -50,7 +51,7 @@ spring:
 
         provider:
           keycloak:
-            issuer-uri: http://localhost:8088/realms/food-ordering-realm
+            issuer-uri: http://192.168.122.102:8080/realms/master
 #          facebook:
 #            authorization-uri: https://www.facebook.com/dialog/oauth
 #            token-uri: https://graph.facebook.com/oauth/access_token

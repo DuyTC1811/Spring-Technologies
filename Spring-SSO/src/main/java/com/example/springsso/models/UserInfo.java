@@ -2,6 +2,7 @@ package com.example.springsso.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -12,6 +13,7 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@NullMarked
 public class UserInfo implements OAuth2User, UserDetails {
     private String userId;
     private String name;
@@ -76,7 +78,7 @@ public class UserInfo implements OAuth2User, UserDetails {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (getClass() != o.getClass()) return false;
         UserInfo user = (UserInfo) o;
         return Objects.equals(userId, user.userId);
     }

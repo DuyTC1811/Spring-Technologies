@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -41,30 +43,25 @@ public class SecurityConfig {
     private final AuthenticatesHandler authenticatesHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        String[] endpointPermitAll = replaceAll(endpoint);
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, ClientRegistrationRepository repo){
+        var logoutHandler = new OidcClientInitiatedLogoutSuccessHandler(repo);
+        logoutHandler.setPostLogoutRedirectUri("{baseUrl}/");
 
         httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)                                  // Disable CSRF protection
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))      // Enable CORS with custom configuration
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(endpointPermitAll).permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/css/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-
-                // Config OAuth2
                 .oauth2Login(oauth2 -> oauth2
-                        .successHandler(authenticatesHandler)
+                        .defaultSuccessUrl("/menu", true)
+                )
+                .logout(logout -> logout
+                        .logoutSuccessHandler(logoutHandler)   // thay cho logoutSuccessUrl
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
                 );
-
-                // Handling authentication
-//                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(unauthorizedHandler))
-
-                // Thêm JWT filter trước UsernamePasswordAuthenticationFilter
-//                .addFilterBefore(null, UsernamePasswordAuthenticationFilter.class);
-
         return httpSecurity.build();
     }
 
